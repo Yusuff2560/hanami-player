@@ -1,6 +1,8 @@
 // Ses çalar elemanı, Web Audio analiz zinciri ve ritim (bas/tiz/vuruş) hesabı.
 // Arayüzden bağımsızdır: sonuçlar CSS değişkenleri olarak hedef elemana yazılır.
 
+import { pulseAt, type Rhythm } from './rhythm';
+
 export const audio = new Audio();
 audio.volume = 0.8;
 
@@ -27,6 +29,14 @@ let vizTarget: HTMLElement | null = null;
 let running = false;
 let gain = 1;
 let reduceFlash = false;
+let rhythm: Rhythm | null = null;
+
+// Çalan şarkının önceden hesaplanmış vuruş haritası (yoksa anlık dinlemeye düşülür).
+export function setRhythm(r: Rhythm | null) {
+  rhythm = r;
+  document.documentElement.dataset.rhythm = r ? 'ready' : 'pending';
+  document.documentElement.dataset.rhythmHits = r ? String(r.hits) : '0';
+}
 
 // Sert parlamalar saniyede 3'ten az tutulur (yanıp sönme eşiği); vuruşlar arası en az 340 ms.
 const MIN_BEAT_GAP_MS = 340;
@@ -114,11 +124,12 @@ export function startVisualizer() {
 
 // Titreme: bas ve vuruşla büyüyen, hızlı ve birbirinden bağımsız üç salınım (x, y, dönme).
 // Hareket tercihi kapalıysa ya da "ışık azaltma" açıksa tamamen sıfırlanır.
-const SHAKE_MAX_PX = 5;
-function writeShake(now: number, bass: number, beat: number, enabled: boolean) {
+const SHAKE_MAX_PX = 7;
+function writeShake(now: number, intensity: number, enabled: boolean) {
   if (!vizTarget) return;
-  const amp = enabled ? Math.min(SHAKE_MAX_PX, Math.pow(bass, 1.6) * 2.4 + beat * 3) : 0;
+  const amp = enabled ? Math.min(SHAKE_MAX_PX, intensity * 5) : 0;
   const t = now / 1000;
+  vizTarget.style.setProperty('--shake-amp', amp.toFixed(2));
   vizTarget.style.setProperty('--shake-x', (Math.sin(t * 2 * Math.PI * 17) * amp).toFixed(2) + 'px');
   vizTarget.style.setProperty('--shake-y', (Math.sin(t * 2 * Math.PI * 23 + 1.3) * amp * 0.6).toFixed(2) + 'px');
   vizTarget.style.setProperty('--shake-r', (Math.sin(t * 2 * Math.PI * 13 + 2.1) * amp * 0.07).toFixed(3) + 'deg');
@@ -174,7 +185,7 @@ function frame(now: number) {
   if (!playing && viz.bass < 0.004 && viz.beat < 0.004 && viz.treb < 0.004) {
     viz.bass = viz.beat = viz.treb = 0;
     writeVars(0, 0, 0);
-    writeShake(now, 0, 0, false);
+    writeShake(now, 0, false);
     running = false;
     return;
   }
@@ -182,7 +193,13 @@ function frame(now: number) {
   const g = Math.min(1.6, gain) * (reduceMotionQuery?.matches ? 0.45 : 1);
   // Işık azaltma açıkken sert vuruş parlaması kapanır, sürekli bas nabzı yarıya iner.
   writeVars(viz.bass * g * (reduceFlash ? 0.5 : 1), reduceFlash ? 0 : viz.beat * g, viz.treb * g * (reduceFlash ? 0.5 : 1));
-  writeShake(now, viz.bass * g, viz.beat * g, !reduceFlash && !reduceMotionQuery?.matches);
+  // Şarkı analiz edildiyse titreme vuruş haritasından (çalma konumuna göre), değilse anlık bastan gelir.
+  let shake = Math.pow(viz.bass * g, 1.6) * 0.5 + viz.beat * g * 0.6;
+  if (rhythm && !audio.paused) {
+    const latency = audioCtx ? (audioCtx.outputLatency || audioCtx.baseLatency || 0) : 0;
+    shake = pulseAt(rhythm, audio.currentTime - latency) * g;
+  }
+  writeShake(now, shake, !reduceFlash && !reduceMotionQuery?.matches);
   requestAnimationFrame(frame);
 }
 
@@ -190,3 +207,7 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && isMediaPlaying()) startVisualizer();
 });
 window.addEventListener('pointerdown', () => initAudioContext(), { once: true });
+
+if (import.meta.env.DEV) {
+  (window as unknown as { __hanami: unknown }).__hanami = { audio, getRhythm: () => rhythm, getCtx: () => audioCtx, pulseAt };
+}

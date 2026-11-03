@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { audio, initAudioContext, startVisualizer } from './engine/audio';
+import { audio, initAudioContext, setRhythm, startVisualizer } from './engine/audio';
+import { analyzeTrack } from './engine/rhythm';
 import { readMp3Cover } from './engine/id3';
 import { normalizeTheme } from './engine/themes';
 
@@ -181,6 +182,11 @@ export const useStore = create<State>((set, get) => ({
     const trackIndex = get().tracks.findIndex(t => t.id === track.id);
     audio.src = track.url;
     audio.play().then(startVisualizer).catch(() => {});
+    setRhythm(null);
+    analyzeTrack(track.id, track.file).then(r => {
+      const now = get().tracks[get().current];
+      if (r && now && now.id === track.id) setRhythm(r);
+    });
     set(s => ({
       queue,
       queueIndex: index,
