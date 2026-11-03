@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { audio, initAudioContext, registerVideo, startVisualizer } from '../engine/audio';
 import { useDraggable } from '../hooks';
+import Icon from './Icon';
 import { useStore } from '../store';
 
 const dragHandle = (target: HTMLElement) => !target.closest('button, .ipod-screen');
@@ -86,7 +87,7 @@ export default function Ipod() {
   const loadVideo = (f: File | undefined) => {
     if (!f) return;
     if (!f.type.startsWith('video/') && !/\.(mp4|m4v|webm|mov)$/i.test(f.name)) {
-      alert('Lütfen bir video dosyası (MP4) seç.');
+      useStore.getState().notify('Bu bir video dosyası değil. MP4, M4V, WebM veya MOV seç.');
       return;
     }
     const v = videoRef.current!;
@@ -122,6 +123,7 @@ export default function Ipod() {
     <div
       ref={boxRef}
       className={classes}
+      role="region"
       aria-label="iPod video oynatıcı"
       onDragEnter={e => {
         e.preventDefault();
@@ -142,11 +144,11 @@ export default function Ipod() {
       }}
     >
       <div className="ipod-body">
-        <button className="ipod-close" title="Kapat" onClick={() => setIpod(false)}>
-          ×
+        <button className="ipod-close" aria-label="Video oynatıcıyı kapat" onClick={() => setIpod(false)}>
+          <Icon name="close" size={14} />
         </button>
         <div className="ipod-screen" onDoubleClick={() => videoRef.current?.requestFullscreen?.().catch(() => {})}>
-          <video ref={videoRef} playsInline preload="metadata" onClick={togglePlay} />
+          <video ref={videoRef} playsInline preload="metadata" aria-label="Video" onClick={togglePlay} />
           <div className="ipod-empty">
             MP4 sürükle-bırak
             <br />
@@ -165,28 +167,28 @@ export default function Ipod() {
           </div>
         </div>
         <div className="ipod-wheel" ref={wheelRef}>
-          <button className="w-menu" title="Video seç" onClick={() => fileRef.current?.click()}>
+          <button className="w-menu" aria-label="Video seç" onClick={() => fileRef.current?.click()}>
             MENU
           </button>
-          <button className="w-prev" title="10 sn geri" onClick={() => skip(-10)}>
-            ◀◀
+          <button className="w-prev" aria-label="10 saniye geri" onClick={() => skip(-10)}>
+            <Icon name="prev" size={16} />
           </button>
-          <button className="w-next" title="10 sn ileri" onClick={() => skip(10)}>
-            ▶▶
+          <button className="w-next" aria-label="10 saniye ileri" onClick={() => skip(10)}>
+            <Icon name="next" size={16} />
           </button>
           <button
             className="w-mute"
-            title="Sesi kapat / aç"
+            aria-label="Sesi kapat veya aç"
             onClick={() => {
               const v = videoRef.current!;
               v.muted = !v.muted;
               showHud(v.muted ? 'Ses kapalı' : 'Ses açık');
             }}
           >
-            ♪
+            <Icon name="volume" size={16} />
           </button>
-          <button className="w-center" title="Oynat / duraklat" onClick={togglePlay}>
-            {playing ? 'Ⅱ' : '▶'}
+          <button className="w-center" aria-label={playing ? 'Videoyu duraklat' : 'Videoyu oynat'} onClick={togglePlay}>
+            <Icon name={playing ? 'pause' : 'play'} size={18} />
           </button>
         </div>
       </div>

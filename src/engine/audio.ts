@@ -26,10 +26,18 @@ let videoEl: HTMLVideoElement | null = null;
 let vizTarget: HTMLElement | null = null;
 let running = false;
 let gain = 1;
+let reduceFlash = false;
+
+// Sert parlamalar saniyede 3'ten az tutulur (yanıp sönme eşiği); vuruşlar arası en az 340 ms.
+const MIN_BEAT_GAP_MS = 340;
 
 const reduceMotionQuery =
   typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
 const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
+
+export function setReduceFlash(value: boolean) {
+  reduceFlash = value;
+}
 
 export function setVizTarget(el: HTMLElement | null) {
   vizTarget = el;
@@ -138,7 +146,7 @@ function frame(now: number) {
 
     viz.mean += (bassRaw - viz.mean) * (1 - Math.exp(-dt / 0.9));
     const rising = bassRaw - viz.prevBass > 0.008;
-    if (rising && bassRaw > viz.mean * 1.15 + 0.03 && now - viz.lastBeat > 150) {
+    if (rising && bassRaw > viz.mean * 1.15 + 0.03 && now - viz.lastBeat > MIN_BEAT_GAP_MS) {
       viz.lastBeat = now;
       viz.beat = Math.max(viz.beat, clamp01((bassRaw - viz.mean) / 0.3 + 0.55));
     }
@@ -159,7 +167,8 @@ function frame(now: number) {
   }
 
   const g = Math.min(1.6, gain) * (reduceMotionQuery?.matches ? 0.45 : 1);
-  writeVars(viz.bass * g, viz.beat * g, viz.treb * g);
+  // Işık azaltma açıkken sert vuruş parlaması kapanır, sürekli bas nabzı yarıya iner.
+  writeVars(viz.bass * g * (reduceFlash ? 0.5 : 1), reduceFlash ? 0 : viz.beat * g, viz.treb * g * (reduceFlash ? 0.5 : 1));
   requestAnimationFrame(frame);
 }
 

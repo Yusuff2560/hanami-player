@@ -1,0 +1,283 @@
+/* =============================================================
+   v12 — Erişilebilirlik, Apple HIG uyumu ve mobil düzen
+   app.css'in üzerine biner; görsel kimlik değişmez, davranış netleşir.
+   ============================================================= */
+
+:root {
+  --focus: var(--pale);
+  --bottom-chrome: 88px;
+  --tabbar-h: 56px;
+  --mini-h: 64px;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+html[data-theme="snow"] { --focus: #2f5d8a; }
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.app { height: 100vh; height: 100dvh; }
+
+/* ---------- Odak ---------- */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.theme-dropdown:focus-visible { outline: none; }
+.theme-picker:focus-within { border-color: var(--focus); box-shadow: 0 0 0 2px var(--accent-bg); }
+.modal-input:focus-visible { outline: none; }
+.track-hit:focus-visible, .album-card-hit:focus-visible { outline-offset: -3px; border-radius: 6px; }
+input[type=range]:focus-visible { outline-offset: 4px; }
+
+/* ---------- Okunabilirlik: en küçük yazı 12 px ---------- */
+.track-info small, .track-duration, .progress, .now-text small, .mini-info small,
+.subtle, .album-card-meta, .modal-track-dur, .modal-label, .track-selection-count,
+.select-all-btn, .fx-row, .fx-switch, .nav-label, .ipod-hud, .ipod-empty,
+.album-badge, .album-detail-info, .empty p { font-size: 12px; }
+.track-index { font-size: 13px; }
+.ipod-wheel button { color: #5c5953; }
+.ipod-wheel button:hover { color: #111; }
+.ipod-close { color: #55524c; }
+
+/* ---------- Simgeler ve hedef boyutları ---------- */
+button svg { flex: none; display: block; }
+.btn svg { margin-right: 2px; }
+.nav-icon { display: grid; place-items: center; color: currentColor; }
+.nav button.active .nav-icon { color: var(--pink); }
+.tool-icon { display: inline-grid; place-items: center; }
+.empty-symbol { color: var(--muted); filter: none; }
+
+.ctrl, .heart, .track-remove-btn, .album-card-delete, .mini-controls button {
+  min-width: 32px; min-height: 32px; display: grid; place-items: center;
+}
+.ctrl.main-ctrl, .mini-play-btn { padding: 0; }
+.mini-close, .ipod-close, .modal-close-btn, .toast-close {
+  width: 28px; height: 28px; display: grid; place-items: center; padding: 0; background: transparent;
+}
+.mini-close { right: 4px; top: 4px; }
+.ipod-close { top: 4px; right: 6px; }
+.now-playing { background: none; border: 0; color: inherit; text-align: left; padding: 0; }
+.now-text { display: block; min-width: 0; }
+.back-btn { margin-bottom: 18px; }
+.btn.danger { color: #ff8a9b; }
+html[data-theme="snow"] .btn.danger, #mainApp[data-theme="snow"] .btn.danger { color: #b3213b; }
+
+.btn { min-height: 36px; }
+.icon-btn {
+  width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
+  background: transparent; color: var(--pale);
+}
+.icon-btn:hover { background: var(--accent-bg); }
+#mainApp[data-theme="snow"] .icon-btn { color: #35597c; }
+
+.top-actions-compact { display: none; gap: 2px; align-items: center; }
+.immersive-grab { display: none; }
+
+/* ---------- Satır / kart: odaklanabilir tek oynat düğmesi ---------- */
+.track { position: relative; }
+.track-hit {
+  position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; z-index: 0;
+}
+.track > .track-index, .track > .track-main, .track > .track-duration { position: relative; pointer-events: none; }
+.track .heart, .track .track-remove-btn { position: relative; z-index: 1; }
+.track-main { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.track:has(.track-hit:focus-visible) { background: rgba(255, 255, 255, .06); }
+
+.album-card-hit { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; z-index: 0; border-radius: inherit; }
+.album-card-cover, .album-card-title, .album-card-meta { position: relative; pointer-events: none; }
+.album-card-play, .album-card-delete { pointer-events: auto; z-index: 1; }
+.album-card-play { display: grid; }
+.album-card:focus-within .album-card-play, .album-card:focus-within .album-card-delete { opacity: 1; transform: none; }
+.album-card-delete { position: relative; }
+
+/* ---------- Formlar ---------- */
+.field-error { margin: 8px 0 0; font-size: 12px; color: #ff8a9b; }
+.modal-input[aria-invalid="true"] { border-color: #ff8a9b; }
+.fx-row, .fx-switch {
+  margin-top: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r); color: var(--muted);
+}
+.fx-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.fx-switch input {
+  appearance: none; -webkit-appearance: none; flex: none; margin: 0; width: 38px; height: 22px;
+  border-radius: 11px; background: rgba(255, 255, 255, .22); position: relative; cursor: pointer;
+  transition: background .2s; accent-color: auto; width: 38px;
+}
+.fx-switch input::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transition: transform .2s;
+}
+.fx-switch input:checked { background: var(--pink); }
+.fx-switch input:checked::after { transform: translateX(16px); background: #120e14; }
+html[data-theme="snow"] .fx-switch input { background: #c3d0dd; }
+html[data-theme="snow"] .fx-switch input:checked { background: #2f5d8a; }
+html[data-theme="snow"] .fx-switch input:checked::after { background: #fff; }
+#mainApp[data-theme="snow"] .fx-row, #mainApp[data-theme="snow"] .fx-switch { color: #5b7186; border-color: #d3dfeb; }
+
+/* ---------- Bildirim ---------- */
+.toast-region {
+  position: fixed; left: 0; right: 0; bottom: calc(var(--bottom-chrome) + 16px);
+  display: flex; justify-content: center; padding: 0 16px; pointer-events: none; z-index: 10000;
+}
+.toast {
+  pointer-events: auto; display: flex; align-items: center; gap: 8px; max-width: 560px;
+  padding: 6px 6px 6px 16px; background: rgba(28, 24, 34, .97); color: #f7eff4;
+  border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+  animation: toastIn .22s cubic-bezier(.2, .8, .2, 1);
+}
+.toast-text { font-size: 13px; line-height: 1.45; padding: 6px 0; }
+.toast-action {
+  background: transparent; color: var(--pale); font-weight: 700; font-size: 13px;
+  min-height: 36px; padding: 0 12px; border-radius: 8px; text-decoration: underline;
+}
+.toast-close { color: var(--muted); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Alt sayfa (sheet) ---------- */
+.sheet-backdrop {
+  position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(8, 7, 10, .55); opacity: 0; visibility: hidden;
+  transition: opacity .2s, visibility 0s .28s;
+}
+.sheet-backdrop.open { opacity: 1; visibility: visible; transition-delay: 0s; }
+.sheet {
+  width: min(560px, 100%); max-height: 88vh; max-height: 88dvh; display: flex; flex-direction: column;
+  background: #17141b; border: 1px solid var(--line); border-bottom: 0; border-radius: 18px 18px 0 0;
+  transform: translateY(100%); transition: transform .28s cubic-bezier(.2, .8, .2, 1); padding-bottom: var(--sab);
+}
+.sheet-backdrop.open .sheet { transform: none; }
+.sheet-grab, .immersive-grab { place-items: center; touch-action: none; cursor: grab; }
+.sheet-grab { display: grid; padding: 8px 0 2px; }
+.sheet-grabber { width: 36px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .3); }
+.sheet-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: 0 8px 8px; }
+.sheet-head h2 { margin: 0; text-align: center; font: 700 17px/1.2 var(--font-display); }
+.sheet-close { width: 44px; height: 44px; display: grid; place-items: center; background: transparent; color: var(--muted); border-radius: 50%; }
+.sheet-body { overflow: auto; padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.sheet .theme-picker { width: 100%; padding: 12px; }
+.sheet .theme-dropdown { flex: 1; min-width: 0; font-size: 14px; }
+.sheet .sidebar-tools { margin-top: 0; }
+
+/* ---------- Cam: yalnızca işlevsel katman (alt çubuk, mini oynatıcı, sekme çubuğu) ---------- */
+.playerbar { background: rgba(9, 8, 11, .72); -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4); }
+.mini-player { background: rgba(15, 13, 18, .8); -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4); }
+.tabbar { display: none; }
+
+/* ---------- Tercihler: şeffaflık, kontrast, hareket ---------- */
+@media (prefers-reduced-transparency: reduce) {
+  .playerbar, .mini-player, .tabbar, .modal-backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .playerbar, .tabbar { background: #0d0b10; }
+  .mini-player { background: #100e13; }
+}
+@media (prefers-contrast: more) {
+  :root { --line: rgba(255, 255, 255, .28); --muted: #cfc5d0; }
+  .btn { border-color: rgba(255, 255, 255, .5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+  .brand-flower { animation: none !important; }
+}
+
+/* ---------- Dokunmatik girdi ---------- */
+@media (pointer: coarse) {
+  .only-fine { display: none; }
+  .btn, .sidebar-tools .btn { min-height: 44px; }
+  .ctrl, .heart, .track-remove-btn, .album-card-delete, .mini-controls button, .toast-close {
+    min-width: 44px; min-height: 44px;
+  }
+  .mini-close, .ipod-close, .modal-close-btn { width: 44px; height: 44px; }
+  .ipod-wheel button { min-width: 44px; min-height: 36px; }
+  .select-all-btn { min-height: 44px; padding: 0 8px; }
+  .modal-track-item { min-height: 48px; }
+  input[type=range] { min-height: 32px; }
+}
+@media (hover: none) {
+  .album-card-play, .album-card-delete { opacity: 1; transform: none; }
+  .album-card:hover { transform: none; }
+}
+
+/* ---------- Dar genişlik (telefon): kenar çubuğu yerine sekme çubuğu ---------- */
+@media (max-width: 767px) {
+  :root { --bottom-chrome: calc(var(--tabbar-h) + var(--mini-h) + var(--sab)); }
+  .only-wide { display: none; }
+
+  .app { flex-direction: column; }
+  .sidebar { display: none; }
+  .main { flex: 1; min-height: 0; width: 100%; }
+
+  .tabbar {
+    display: flex; flex: none; height: calc(var(--tabbar-h) + var(--sab)); padding-bottom: var(--sab);
+    background: rgba(12, 10, 15, .8); -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4);
+    border-top: 1px solid var(--line); position: relative; z-index: 5;
+  }
+  .tabbar-item {
+    flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; background: transparent; color: #b9aebc; font-size: 12px; font-weight: 500;
+  }
+  .tabbar-item.active { color: var(--pink); }
+  #mainApp[data-theme="snow"] .tabbar { background: rgba(255, 255, 255, .86); border-top-color: #d8e3ed; }
+  #mainApp[data-theme="snow"] .tabbar-item { color: #53677b; }
+  #mainApp[data-theme="snow"] .tabbar-item.active { color: #2f5d8a; }
+
+  .topbar { height: auto; min-height: calc(56px + var(--sat)); padding: var(--sat) 8px 0 16px; }
+  .topbar h1 { font-size: 24px; }
+  .top-actions-compact { display: flex; }
+  .content { padding: 12px 16px 24px; }
+
+  .welcome { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .welcome h2 { font-size: 30px; }
+  .welcome p { font-size: 14px; }
+  .stats { display: flex; }
+  .stat { padding: 2px 18px 2px 0; border-left: 0; }
+  .stat + .stat { padding-left: 18px; border-left: 1px solid var(--line); }
+  .stat strong { font-size: 26px; }
+  .section-head { margin: 12px 0 6px; flex-wrap: wrap; gap: 8px; }
+  .section-head h3 { font-size: 19px; }
+
+  .track { grid-template-columns: minmax(0, 1fr) auto 44px; gap: 8px; padding: 8px 0 8px 4px; min-height: 60px; }
+  .track.has-extra-action { grid-template-columns: minmax(0, 1fr) auto 44px 44px; }
+  .track-index { display: none; }
+  .track .cover { width: 44px; height: 44px; }
+  .track-info b { font-size: 15px; }
+  .track-info small { font-size: 12px; }
+
+  .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .album-detail-banner { flex-direction: column; align-items: flex-start; gap: 16px; padding: 16px; }
+  .album-detail-art { width: 120px; height: 120px; }
+  .album-detail-title { font-size: 22px; white-space: normal; }
+
+  .playerbar { height: var(--mini-h); padding: 0 4px 0 12px; gap: 4px; position: relative; }
+  .playerbar .progress, .playerbar .volume, .ctrl-prev { display: none; }
+  .playerbar-line { display: block; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(255, 255, 255, .12); }
+  .playerbar-line i { display: block; height: 100%; background: var(--pink); }
+  .now-playing { flex: 1; width: auto; min-width: 0; }
+  .controls { margin: 0; gap: 0; }
+  .ctrl.main-ctrl { width: 44px; height: 44px; }
+  #mainApp[data-theme="snow"] .playerbar-line { background: #d8e3ed; }
+  #mainApp[data-theme="snow"] .playerbar-line i { background: #2f5d8a; }
+
+  .mini-player { display: none !important; }
+  .ipod { right: 12px; bottom: calc(var(--bottom-chrome) + 12px); }
+
+  .immersive { padding: var(--sat) 0 var(--sab); }
+  .immersive-grab { display: grid; position: absolute; top: var(--sat); left: 0; right: 0; height: 28px; z-index: 2; }
+  .player-back { top: calc(24px + var(--sat)); left: 12px; width: 44px; height: 44px; }
+  .player-content { width: calc(100% - 48px); max-width: 470px; }
+  .big-cover { width: min(320px, 78vw); margin-bottom: 24px; }
+  .big-controls { gap: 32px; }
+  .big-controls button, .player-extra button { min-width: 48px; min-height: 48px; display: grid; place-items: center; }
+  .big-controls .play-large { width: 64px; height: 64px; }
+
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+  .modal-box { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 18px 18px 0 0; animation: sheetUp .28s cubic-bezier(.2, .8, .2, 1); }
+  .modal-footer { padding-bottom: calc(16px + var(--sab)); }
+  .modal-input { font-size: 16px; }
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+.playerbar-line { display: none; }
+@media (max-width: 767px) { .playerbar-line { display: block; } }

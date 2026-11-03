@@ -33,6 +33,7 @@ legacy/       taşıma öncesi tek dosyalık v11 sürümü (referans)
 - [ ] Ritme göre değişen kanji
 - [ ] Temayla uyumlu mini video oynatıcı
 - [ ] Electron ile Windows `.exe`
+- [ ] Capacitor ile Android `.apk`
 
 ## Lisans
 

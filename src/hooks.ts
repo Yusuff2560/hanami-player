@@ -13,6 +13,70 @@ export function useAudioProgress() {
   return state;
 }
 
+export function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => matchMedia(query).matches);
+  useEffect(() => {
+    const mq = matchMedia(query);
+    const onChange = () => setMatches(mq.matches);
+    onChange();
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+  return matches;
+}
+
+// Tutamaktan aşağı sürükleyerek kapatma. Her zaman bir kapat düğmesiyle birlikte kullanılmalı.
+export function useSwipeDown(
+  handleRef: React.RefObject<HTMLElement | null>,
+  targetRef: React.RefObject<HTMLElement | null>,
+  onClose: () => void,
+  enabled = true
+) {
+  useEffect(() => {
+    const handle = handleRef.current;
+    const target = targetRef.current;
+    if (!handle || !target || !enabled) return;
+    let startY = 0;
+    let dy = 0;
+    let active = false;
+
+    const down = (e: PointerEvent) => {
+      active = true;
+      startY = e.clientY;
+      dy = 0;
+      target.style.transition = 'none';
+      handle.setPointerCapture(e.pointerId);
+    };
+    const move = (e: PointerEvent) => {
+      if (!active) return;
+      dy = Math.max(0, e.clientY - startY);
+      target.style.transform = `translateY(${dy}px)`;
+    };
+    const end = (e: PointerEvent) => {
+      if (!active) return;
+      active = false;
+      target.style.transition = '';
+      target.style.transform = '';
+      try {
+        handle.releasePointerCapture(e.pointerId);
+      } catch {
+        /* zaten bırakılmış */
+      }
+      if (dy > 90) onClose();
+    };
+    handle.addEventListener('pointerdown', down);
+    handle.addEventListener('pointermove', move);
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
+    return () => {
+      handle.removeEventListener('pointerdown', down);
+      handle.removeEventListener('pointermove', move);
+      handle.removeEventListener('pointerup', end);
+      handle.removeEventListener('pointercancel', end);
+    };
+  }, [handleRef, targetRef, onClose, enabled]);
+}
+
 export function seekToPercent(pct: number) {
   if (audio.duration) audio.currentTime = (audio.duration * pct) / 100;
 }

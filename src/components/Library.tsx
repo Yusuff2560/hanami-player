@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react';
-import { audio } from '../engine/audio';
 import { fmt, useStore, type Album, type Track } from '../store';
+import Icon from './Icon';
 
 export function Cover({ url, className }: { url: string | null; className?: string }) {
-  return <div className={className}>{url ? <img src={url} alt="Kapak Resmi" /> : '✿'}</div>;
+  return (
+    <div className={className} aria-hidden="true">
+      {url ? <img src={url} alt="" /> : '✿'}
+    </div>
+  );
 }
 
 function albumTracksOf(album: Album, tracks: Track[]) {
@@ -13,7 +17,9 @@ function albumTracksOf(album: Album, tracks: Track[]) {
 function Empty({ symbol, title, message, action }: { symbol: string; title: string; message: string; action?: ReactNode }) {
   return (
     <div className="empty">
-      <div className="empty-symbol">{symbol}</div>
+      <div className="empty-symbol" aria-hidden="true">
+        {symbol}
+      </div>
       <b>{title}</b>
       <p>{message}</p>
       {action}
@@ -40,9 +46,12 @@ function TrackRow({
 }) {
   const toggleFav = useStore.getState().toggleFav;
   return (
-    <div className={'track' + (onRemove ? ' has-extra-action' : '') + (isCurrent ? ' playing' : '')} onClick={onPlay}>
-      <div className="track-index">{isCurrent ? (playing ? '♫' : '▶') : String(index + 1).padStart(2, '0')}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+    <div className={'track' + (onRemove ? ' has-extra-action' : '') + (isCurrent ? ' playing' : '')}>
+      <button className="track-hit" aria-label={`${track.name} çal`} aria-current={isCurrent ? 'true' : undefined} onClick={onPlay} />
+      <div className="track-index" aria-hidden="true">
+        {isCurrent ? <Icon name={playing ? 'music' : 'play'} size={15} /> : String(index + 1).padStart(2, '0')}
+      </div>
+      <div className="track-main">
         <Cover url={track.coverUrl} className="cover" />
         <div className="track-info">
           <b>{track.name}</b>
@@ -52,24 +61,15 @@ function TrackRow({
       <div className="track-duration">{track.duration}</div>
       <button
         className={'heart' + (track.fav ? ' on' : '')}
-        title="Favori"
-        onClick={e => {
-          e.stopPropagation();
-          toggleFav(track.id);
-        }}
+        aria-label={track.fav ? `${track.name} favorilerden çıkar` : `${track.name} favorilere ekle`}
+        aria-pressed={track.fav}
+        onClick={() => toggleFav(track.id)}
       >
-        {track.fav ? '♥' : '♡'}
+        <Icon name={track.fav ? 'heartFill' : 'heart'} size={18} />
       </button>
       {onRemove && (
-        <button
-          className="track-remove-btn"
-          title="Albümden çıkar"
-          onClick={e => {
-            e.stopPropagation();
-            onRemove();
-          }}
-        >
-          ✕
+        <button className="track-remove-btn" aria-label={`${track.name} albümden çıkar`} onClick={onRemove}>
+          <Icon name="close" size={16} />
         </button>
       )}
     </div>
@@ -84,7 +84,8 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
   const current = useStore(s => s.current);
   const playing = useStore(s => s.playing);
   const activeAlbumId = useStore(s => s.activeAlbumId);
-  const { playFromQueue, setActiveAlbum, openModal, deleteAlbum, removeTrackFromAlbum } = useStore.getState();
+  const { playFromQueue, setActiveAlbum, openModal, deleteAlbum, removeTrackFromAlbum, notify, setSettingsOpen } =
+    useStore.getState();
 
   const currentTrack = tracks[current];
   const favCount = tracks.filter(t => t.fav).length;
@@ -98,7 +99,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
     music: { list: 'Tüm müzikler', sub: 'Yerel müzik kitaplığın' },
     recent: { list: 'Son çalınan müzikler', sub: 'En son dinlediğin parçalar' },
     favorites: { list: 'Beğendiğin şarkılar', sub: 'Favori müzik koleksiyonun' },
-    albums: { list: 'Oluşturulan Albümler', sub: `${albums.length} özel koleksiyon` }
+    albums: { list: 'Oluşturulan albümler', sub: `${albums.length} özel koleksiyon` }
   }[view];
 
   let body: ReactNode;
@@ -106,12 +107,13 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
   if (view === 'albums' && album) {
     const albumTracks = albumTracksOf(album, tracks);
     const totalSec = albumTracks.reduce((acc, t) => acc + (t.durationSec || 0), 0);
-    const totalLabel = totalSec > 0 ? fmt(totalSec) : `${albumTracks.length} Şarkı`;
+    const totalLabel = totalSec > 0 ? fmt(totalSec) : `${albumTracks.length} şarkı`;
     const cover = albumTracks.find(t => t.coverUrl)?.coverUrl ?? null;
     body = (
       <>
-        <button className="btn" style={{ marginBottom: 18 }} onClick={() => setActiveAlbum(null)}>
-          ← Tüm Albümlere Dön
+        <button className="btn back-btn" onClick={() => setActiveAlbum(null)}>
+          <Icon name="chevronLeft" size={16} />
+          Tüm albümler
         </button>
         <div className="album-detail-banner">
           <Cover url={cover} className="album-detail-art" />
@@ -119,23 +121,26 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
             <span className="album-badge">ALBÜM</span>
             <h2 className="album-detail-title">{album.name}</h2>
             <p className="album-detail-info">
-              {albumTracks.length} Şarkı • Toplam Süre: {totalLabel}
+              {albumTracks.length} şarkı • Toplam süre: {totalLabel}
             </p>
             <div className="album-detail-actions">
               <button
                 className="btn primary"
                 onClick={() => {
-                  if (!albumTracks.length) return alert('Bu albümde henüz çalınacak şarkı yok.');
+                  if (!albumTracks.length) return notify('Bu albümde henüz çalınacak şarkı yok.');
                   playFromQueue(albumTracks, 0, album.name);
                 }}
               >
-                ▶ Tümünü Çal
+                <Icon name="play" size={14} />
+                Tümünü çal
               </button>
               <button className="btn" onClick={() => openModal(album.id)}>
-                ＋ Şarkıları Düzenle
+                <Icon name="plus" size={16} />
+                Şarkıları düzenle
               </button>
-              <button className="btn" style={{ color: '#ff6b81' }} onClick={() => deleteAlbum(album.id)}>
-                Albümü Sil
+              <button className="btn danger" onClick={() => deleteAlbum(album.id)}>
+                <Icon name="trash" size={16} />
+                Albümü sil
               </button>
             </div>
           </div>
@@ -148,7 +153,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
               message="Albüm oluştururken seçtiğin şarkılar silinmiş veya henüz şarkı eklenmemiş."
               action={
                 <button className="btn primary" onClick={() => openModal(album.id)}>
-                  ＋ Şarkı Ekle
+                  Şarkı ekle
                 </button>
               }
             />
@@ -177,7 +182,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
         message="Müziklerini temalarına veya çalma listelerine göre gruplayıp özel albümler oluşturabilirsin."
         action={
           <button className="btn primary" onClick={() => openModal()}>
-            ＋ İlk Albümünü Oluştur
+            İlk albümünü oluştur
           </button>
         }
       />
@@ -187,33 +192,28 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
           const at = albumTracksOf(a, tracks);
           const cover = at.find(t => t.coverUrl)?.coverUrl ?? null;
           return (
-            <div key={a.id} className="album-card" onClick={() => setActiveAlbum(a.id)}>
+            <div key={a.id} className="album-card">
+              <button className="album-card-hit" aria-label={`${a.name} albümünü aç`} onClick={() => setActiveAlbum(a.id)} />
               <div className="album-card-cover">
-                <div className="album-cover-holder">{cover ? <img src={cover} alt="Kapak Resmi" /> : '✿'}</div>
+                <div className="album-cover-holder" aria-hidden="true">
+                  {cover ? <img src={cover} alt="" /> : '✿'}
+                </div>
                 <button
                   className="album-card-play"
-                  title="Tümünü Çal"
-                  onClick={e => {
-                    e.stopPropagation();
-                    if (!at.length) return alert('Bu albümde şarkı bulunmuyor.');
+                  aria-label={`${a.name} albümünü çal`}
+                  onClick={() => {
+                    if (!at.length) return notify('Bu albümde şarkı bulunmuyor.');
                     playFromQueue(at, 0, a.name);
                   }}
                 >
-                  ▶
+                  <Icon name="play" size={16} />
                 </button>
               </div>
               <div className="album-card-title">{a.name}</div>
               <div className="album-card-meta">
-                <span>{at.length} Şarkı</span>
-                <button
-                  className="album-card-delete"
-                  title="Albümü sil"
-                  onClick={e => {
-                    e.stopPropagation();
-                    deleteAlbum(a.id);
-                  }}
-                >
-                  🗑
+                <span>{at.length} şarkı</span>
+                <button className="album-card-delete" aria-label={`${a.name} albümünü sil`} onClick={() => deleteAlbum(a.id)}>
+                  <Icon name="trash" size={16} />
                 </button>
               </div>
             </div>
@@ -236,7 +236,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
       if (tracks.length) {
         if (view === 'favorites') {
           title = 'Henüz favori şarkı eklemedin';
-          message = 'Şarkıların yanındaki kalp (♡) simgesine tıklayarak favorilerine parça ekleyebilirsin.';
+          message = 'Şarkıların yanındaki kalp simgesine dokunarak favorilerine parça ekleyebilirsin.';
         } else if (view === 'recent') {
           title = 'Henüz şarkı çalınmadı';
           message = 'Müzik kitaplığından şarkı çaldıkça son çalınanlar listesi burada belirecek.';
@@ -265,7 +265,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
               track={t}
               index={i}
               isCurrent={currentTrack === t}
-              playing={playing && !audio.paused}
+              playing={playing}
               subtitle="Yerel dosya"
               onPlay={() => playFromQueue(list, i, titles.list)}
             />
@@ -279,6 +279,14 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
     <>
       <header className="topbar">
         <h1>{pageTitle}</h1>
+        <div className="top-actions-compact">
+          <button className="icon-btn" aria-label="Müzik ekle" onClick={onPickFiles}>
+            <Icon name="plus" size={22} />
+          </button>
+          <button className="icon-btn" aria-label="Ayarlar" onClick={() => setSettingsOpen(true)}>
+            <Icon name="settings" size={22} />
+          </button>
+        </div>
       </header>
       <section className="content" id="mainContent">
         {!album && (
@@ -311,7 +319,8 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
               <div>
                 {view === 'albums' && (
                   <button className="btn primary" onClick={() => openModal()}>
-                    ＋ Yeni Albüm Oluştur
+                    <Icon name="plus" size={16} />
+                    Yeni albüm oluştur
                   </button>
                 )}
               </div>

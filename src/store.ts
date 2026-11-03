@@ -22,11 +22,18 @@ export interface Album {
   createdAt?: number;
 }
 
+export interface Toast {
+  id: number;
+  message: string;
+  action?: { label: string; run: () => void };
+}
+
 export type View = 'music' | 'albums' | 'recent' | 'favorites';
 
 const STORAGE_ALBUMS = 'hanami_albums_v1';
 const STORAGE_THEME = 'hanami_theme_v1';
 const STORAGE_FX = 'hanamiFxGain';
+const STORAGE_FLASH = 'hanami_reduce_flash_v1';
 
 export const fmt = (s: number) =>
   !isFinite(s) || s < 0 ? '0:00' : Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
@@ -60,6 +67,9 @@ interface State {
   activeAlbumId: number | null;
   theme: string;
   fxGain: number;
+  reduceFlash: boolean;
+  toast: Toast | null;
+  settingsOpen: boolean;
   playing: boolean;
   immersiveOpen: boolean;
   miniVisible: boolean;
@@ -76,6 +86,10 @@ interface State {
   setActiveAlbum: (id: number | null) => void;
   setTheme: (key: string) => void;
   setFxGain: (value: number) => void;
+  setReduceFlash: (value: boolean) => void;
+  notify: (message: string, action?: Toast['action']) => void;
+  dismissToast: () => void;
+  setSettingsOpen: (open: boolean) => void;
   setImmersive: (open: boolean) => void;
   setMini: (visible: boolean) => void;
   setIpod: (visible: boolean) => void;
@@ -88,7 +102,9 @@ interface State {
 
 let nextTrackId = 1;
 
-const initialTheme = normalizeTheme(readStorage(STORAGE_THEME, 'sakura', v => v));
+const prefersLight = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: light)').matches;
+const prefersReducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const initialTheme = normalizeTheme(readStorage(STORAGE_THEME, prefersLight ? 'snow' : 'sakura', v => v));
 
 export const useStore = create<State>((set, get) => ({
   tracks: [],
@@ -102,6 +118,9 @@ export const useStore = create<State>((set, get) => ({
   activeAlbumId: null,
   theme: initialTheme,
   fxGain: readStorage(STORAGE_FX, 1, raw => Number(raw)),
+  reduceFlash: readStorage(STORAGE_FLASH, prefersReducedMotion, raw => raw === '1'),
+  toast: null,
+  settingsOpen: false,
   playing: false,
   immersiveOpen: false,
   miniVisible: false,
@@ -151,7 +170,7 @@ export const useStore = create<State>((set, get) => ({
     }));
 
     if (fresh.length === 0 && files.length) {
-      alert('Seçilen dosyalarda desteklenen bir ses dosyası bulunamadı veya dosyalar zaten kitaplıkta.');
+      get().notify('Desteklenen bir ses dosyası bulunamadı ya da dosyalar zaten kitaplıkta.');
     }
   },
 
@@ -223,6 +242,23 @@ export const useStore = create<State>((set, get) => ({
     set({ fxGain: value });
   },
 
+  setReduceFlash(value) {
+    writeStorage(STORAGE_FLASH, value ? '1' : '0');
+    set({ reduceFlash: value });
+  },
+
+  notify(message, action) {
+    set({ toast: { id: Date.now(), message, action } });
+  },
+
+  dismissToast() {
+    set({ toast: null });
+  },
+
+  setSettingsOpen(open) {
+    set({ settingsOpen: open });
+  },
+
   setImmersive(open) {
     if (open && get().current < 0) return;
     set({ immersiveOpen: open });
@@ -238,7 +274,7 @@ export const useStore = create<State>((set, get) => ({
 
   openModal(editingId = null) {
     if (!get().tracks.length) {
-      alert('Kütüphanende henüz müzik bulunmuyor.\nÖnce "＋ Müzik ekle" düğmesini kullanarak bilgisayarından şarkı eklemelisin.');
+      get().notify('Önce müzik eklemelisin. "Müzik ekle" ile başlayabilirsin.');
       return;
     }
     set({ modal: { open: true, editingId } });
@@ -269,12 +305,22 @@ export const useStore = create<State>((set, get) => ({
   },
 
   deleteAlbum(id) {
-    const album = get().albums.find(a => a.id === id);
-    if (!album) return;
-    if (!confirm(`"${album.name}" albümünü silmek istediğine emin misin?\n(Şarkıların kitaplığından silinmeyecektir)`)) return;
-    const next = get().albums.filter(a => a.id !== id);
+    const { albums, activeAlbumId } = get();
+    const index = albums.findIndex(a => a.id === id);
+    if (index < 0) return;
+    const removed = albums[index];
+    const next = albums.filter(a => a.id !== id);
     writeStorage(STORAGE_ALBUMS, JSON.stringify(next));
-    set(s => ({ albums: next, activeAlbumId: s.activeAlbumId === id ? null : s.activeAlbumId }));
+    set({ albums: next, activeAlbumId: activeAlbumId === id ? null : activeAlbumId });
+    get().notify(`"${removed.name}" albümü silindi. Şarkıların kitaplıkta duruyor.`, {
+      label: 'Geri al',
+      run: () => {
+        const restored = [...get().albums];
+        restored.splice(Math.min(index, restored.length), 0, removed);
+        writeStorage(STORAGE_ALBUMS, JSON.stringify(restored));
+        set({ albums: restored, toast: null });
+      }
+    });
   },
 
   removeTrackFromAlbum(albumId, trackId) {

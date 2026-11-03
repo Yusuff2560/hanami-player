@@ -1269,25 +1269,6 @@ input[type=range] {
   background: #18141e;
 }
 
-@media(max-width: 780px) {
-  .sidebar { width: 76px; flex-basis: 76px; padding: 16px 7px; }
-  .brand { justify-content: center; margin: 0 auto 18px; padding-bottom:14px; }
-  .brand-name, .nav-label, .nav button span:last-child, .sidebar-foot { display: none; }
-  .sidebar .theme-picker { padding:10px 8px; justify-content:center; }
-  .sidebar .theme-dropdown { display:none; }
-  .sidebar-tools { gap:6px; }
-  .sidebar-tools .btn { justify-content:center; padding:10px 4px; font-size:0; }
-  .sidebar-tools .btn .tool-icon { font-size:17px; }
-  .nav button { justify-content: center; padding: 13px 4px; }
-  .content { padding: 20px 16px; }
-  .topbar { padding: 0 15px; }
-  .stats { display: none; }
-  .playerbar { padding: 0 12px; gap: 9px; }
-  .now-playing { width: 130px; }
-  .volume { display: none; }
-  .progress { max-width: none; }
-}
-
 /* =============================================================
    v11 — GUI yenilemesi + Japonca yazı ses tepkisi + iPod
    (içerik/özellikler aynı; sadece görünüm)

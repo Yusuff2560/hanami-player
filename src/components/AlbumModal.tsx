@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store';
+import Icon from './Icon';
 import { Cover } from './Library';
 
 export default function AlbumModal() {
@@ -10,36 +11,45 @@ export default function AlbumModal() {
   const [name, setName] = useState('');
   const [picked, setPicked] = useState<Set<number>>(new Set());
   const nameRef = useRef<HTMLInputElement>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!open) return;
     const album = editingId ? albums.find(a => a.id === editingId) : undefined;
     setName(album?.name ?? '');
     setPicked(new Set(album?.trackIds ?? []));
+    setError('');
+    returnFocus.current = document.activeElement as HTMLElement | null;
     const id = setTimeout(() => nameRef.current?.focus(), 100);
-    return () => clearTimeout(id);
+    return () => {
+      clearTimeout(id);
+      returnFocus.current?.focus?.();
+    };
   }, [open, editingId]);
 
   const allChecked = tracks.length > 0 && picked.size === tracks.length;
-  const toggle = (id: number) =>
+  const toggle = (id: number) => {
+    setError('');
     setPicked(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+  };
 
   const editing = editingId ? albums.find(a => a.id === editingId) : undefined;
 
   const save = () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      alert('Lütfen albüme bir isim ver.');
+      setError('Albüme bir ad ver.');
       nameRef.current?.focus();
       return;
     }
     if (!picked.size) {
-      alert('Lütfen albüm için en az 1 şarkı seç.');
+      setError('Albüm için en az bir şarkı seç.');
       return;
     }
     saveAlbum(trimmed, tracks.filter(t => picked.has(t.id)).map(t => t.id));
@@ -47,11 +57,11 @@ export default function AlbumModal() {
 
   return (
     <div className={'modal-backdrop' + (open ? ' open' : '')} onClick={e => e.target === e.currentTarget && closeModal()}>
-      <div className="modal-box">
+      <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="albumModalTitle" aria-hidden={!open}>
         <div className="modal-header">
-          <h3>{editing ? `"${editing.name}" Albümünü Düzenle` : 'Yeni Albüm Oluştur'}</h3>
-          <button className="modal-close-btn" title="Kapat" onClick={closeModal}>
-            ✕
+          <h3 id="albumModalTitle">{editing ? `"${editing.name}" albümünü düzenle` : 'Yeni albüm oluştur'}</h3>
+          <button className="modal-close-btn" aria-label="Kapat" onClick={closeModal}>
+            <Icon name="close" size={18} />
           </button>
         </div>
         <div className="modal-body">
@@ -67,8 +77,18 @@ export default function AlbumModal() {
               placeholder="Örn: Akustik Geceler, Favorilerim..."
               autoComplete="off"
               value={name}
-              onChange={e => setName(e.target.value)}
+              aria-invalid={!!error && !name.trim()}
+              aria-describedby={error ? 'albumError' : undefined}
+              onChange={e => {
+                setName(e.target.value);
+                setError('');
+              }}
             />
+            {error && (
+              <p id="albumError" className="field-error" role="alert">
+                {error}
+              </p>
+            )}
           </div>
           <div className="track-selection-head">
             <span className="modal-label" style={{ margin: 0 }}>
@@ -112,7 +132,7 @@ export default function AlbumModal() {
             Vazgeç
           </button>
           <button className="btn primary" onClick={save}>
-            Albümü Kaydet
+            Albümü kaydet
           </button>
         </div>
       </div>

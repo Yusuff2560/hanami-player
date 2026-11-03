@@ -5,6 +5,9 @@ import { themes } from './themes';
 export interface AmbientHandle {
   init: (themeKey: string) => void;
   resize: () => void;
+  setMotion: (opts: { scale?: number; lightning?: boolean }) => void;
+  setDensity: (value: number) => void;
+  setPaused: (value: boolean) => void;
   destroy: () => void;
 }
 
@@ -77,12 +80,19 @@ export function createAmbient(ambientCanvas: HTMLCanvasElement, getThemeKey: () 
     boltSegs: []
   };
   
+  // ── Performans ve erişilebilirlik ayarları ────────────────────
+  let motionScale = 1;      // 1 = normal, <1 = yavaşlatılmış (hareketi azalt)
+  let lightningOn = true;   // false = şimşek parlaması yok
+  let paused = false;       // true = çizim döngüsü durur
+  let looping = true;
+  let density = 1;          // 1 = tam, <1 = daha az parçacık (mobil)
+
   // ── Canvas setup ─────────────────────────────────────────────
   function resizeAmbientCanvas() {
     const main = document.querySelector('.main');
     const w = main ? main.clientWidth : window.innerWidth;
     const h = main ? main.clientHeight : window.innerHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, density < 1 ? 1.5 : 2);
     ambientCanvas.width = w * dpr;
     ambientCanvas.height = h * dpr;
     ambientCtx.resetTransform();
@@ -251,6 +261,12 @@ export function createAmbient(ambientCanvas: HTMLCanvasElement, getThemeKey: () 
           screenX: 0, screenY: 0
         });
       }
+    }
+
+    if (density < 1) {
+      const keep = Math.max(1, Math.round(ambientParticles.length * density));
+      const step = ambientParticles.length / keep;
+      ambientParticles = Array.from({ length: keep }, (_, i) => ambientParticles[Math.floor(i * step)]);
     }
   }
   
@@ -804,7 +820,11 @@ export function createAmbient(ambientCanvas: HTMLCanvasElement, getThemeKey: () 
   let lastAmbientTime = 0;
   
   function animateAmbient(now) {
-    const dt = Math.min((now - lastAmbientTime) / 16.67 || 1, 2.5);
+    if (paused || destroyed) {
+      looping = false;
+      return;
+    }
+    const dt = Math.min((now - lastAmbientTime) / 16.67 || 1, 2.5) * motionScale;
     lastAmbientTime = now;
   
     const main = document.querySelector('.main');
@@ -819,7 +839,7 @@ export function createAmbient(ambientCanvas: HTMLCanvasElement, getThemeKey: () 
     if (mode === 'rain' || mode === 'storm') {
       // ── Rain / Storm ──
       drawClouds(ambientCtx, w, h, mode === 'storm', lightningState.brightness);
-      if (mode === 'storm') updateLightning(ambientCtx, w, h);
+      if (mode === 'storm' && lightningOn) updateLightning(ambientCtx, w, h);
       updateRainWind(dt, mode === 'storm');
   
       ambientParticles.forEach(p => {
@@ -968,6 +988,24 @@ export function createAmbient(ambientCanvas: HTMLCanvasElement, getThemeKey: () 
   return {
     init: initEnvironment,
     resize: resizeAmbientCanvas,
+    setMotion(opts: { scale?: number; lightning?: boolean }) {
+      if (opts.scale !== undefined) motionScale = opts.scale;
+      if (opts.lightning !== undefined) lightningOn = opts.lightning;
+    },
+    setDensity(value: number) {
+      if (value === density) return;
+      density = value;
+      resizeAmbientCanvas();
+      initEnvironment(getThemeKey());
+    },
+    setPaused(value: boolean) {
+      paused = value;
+      if (!value && !looping && !destroyed) {
+        looping = true;
+        lastAmbientTime = performance.now();
+        rafId = requestAnimationFrame(animateAmbient);
+      }
+    },
     destroy() {
       destroyed = true;
       cancelAnimationFrame(rafId);
