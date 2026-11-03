@@ -1,55 +1,55 @@
-# HANAMI èŠ±è¦‹
+# HANAMI 花見
 
-Yerel mÃ¼zik ve video Ã§alar. MÃ¼ziÄŸin ritmine gÃ¶re nefes alan Japonca bir kelime, mevsime gÃ¶re deÄŸiÅŸen yaÄŸmur, kar ve yaprak ortamlarÄ±.
+Yerel müzik ve video çalar. Müziğin ritmine göre nefes alan Japonca bir kelime, mevsime göre değişen yağmur, kar ve yaprak ortamları.
 
-DosyalarÄ±n bilgisayarÄ±ndan hiÃ§bir yere yÃ¼klenmez; her ÅŸey tarayÄ±cÄ±da (veya masaÃ¼stÃ¼ uygulamasÄ±nda) yerelde Ã§alÄ±ÅŸÄ±r.
+Dosyaların bilgisayarından hiçbir yere yüklenmez; her şey tarayıcıda (veya masaüstü uygulamasında) yerelde çalışır.
 
-**CanlÄ±:** https://hanami-player.vercel.app
+**Canlı:** https://hanami-player.vercel.app
 
-## GeliÅŸtirme
+## Geliştirme
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run build      # dist/ klasÃ¶rÃ¼ne Ã¼retim derlemesi
+npm run build      # dist/ klasörüne üretim derlemesi
 npm run typecheck
 ```
 
-## YapÄ±
+## Yapı
 
 ```
 src/
-  engine/     arayÃ¼zden baÄŸÄ±msÄ±z motorlar (ses analizi, parÃ§acÄ±k ortamÄ±, temalar, ID3)
-  components/ React bileÅŸenleri
+  engine/     arayüzden bağımsız motorlar (ses analizi, parçacık ortamı, temalar, ID3)
+  components/ React bileşenleri
   store.ts    uygulama durumu (zustand)
-legacy/       taÅŸÄ±ma Ã¶ncesi tek dosyalÄ±k v11 sÃ¼rÃ¼mÃ¼ (referans)
+legacy/       taşıma öncesi tek dosyalık v11 sürümü (referans)
 ```
 
-## Yol haritasÄ±
+## Yol haritası
 
-- [x] Tek dosyalÄ±k ilk sÃ¼rÃ¼m
-- [x] Vite + React + TypeScript'e taÅŸÄ±ma
-- [ ] EriÅŸilebilirlik ve Apple HIG dÃ¼zeltmeleri
-- [x] Ritimle titreyen kanji (yapay zeka vuruş izleyici: Beat This! small0, ~2M parametre)
-- [ ] Temayla uyumlu mini video oynatÄ±cÄ±
-- [x] Electron ile Windows `.exe` (kurulum + taşınabilir)
+- [x] Tek dosyalık ilk sürüm
+- [x] Vite + React + TypeScript'e taşıma
+- [ ] Erişilebilirlik ve Apple HIG düzeltmeleri
+- [x] Ritimle titreyen kanji (yapay zeka vuru� izleyici: Beat This! small0, ~2M parametre)
+- [ ] Temayla uyumlu mini video oynatıcı
+- [x] Electron ile Windows `.exe` (kurulum + ta��nabilir)
 - [ ] Capacitor ile Android `.apk`
 
 
-## Masaüstü (Windows)
+## Masa�st� (Windows)
 
-Sürümler: https://github.com/Yusuff2560/hanami-player/releases (`HANAMI-Setup-*.exe` kurulum, `HANAMI-Portable-*.exe` kurulumsuz).
-Uygulama imzasızdır; ilk açılışta Windows SmartScreen "Daha fazla bilgi > Yine de çalıştır" diyebilir.
+S�r�mler: https://github.com/Yusuff2560/hanami-player/releases (`HANAMI-Setup-*.exe` kurulum, `HANAMI-Portable-*.exe` kurulumsuz).
+Uygulama imzas�zd�r; ilk a��l��ta Windows SmartScreen "Daha fazla bilgi > Yine de �al��t�r" diyebilir.
 
 ```bash
-npm run electron:dev    # derleyip Electron'da aç
-npm run electron:pack   # release/ klasörüne kurulum ve taşınabilir exe üret
+npm run electron:dev    # derleyip Electron'da a�
+npm run electron:pack   # release/ klas�r�ne kurulum ve ta��nabilir exe �ret
 ```
 
-Yeni sürüm yayınlamak için: `git tag v0.2.0 && git push --tags` (GitHub Actions derleyip Releases'e yükler).
+Yeni s�r�m yay�nlamak i�in: `git tag v0.2.0 && git push --tags` (GitHub Actions derleyip Releases'e y�kler).
 ## Ritim modeli
 
-Ortadaki yazı, çalan şarkının vuruşlarına [Beat This!](https://github.com/CPJKU/beat_this) (small0, MIT) modeliyle senkron titrer. Model tarayıcıda `onnxruntime-web` ile yerelde çalışır, ses hiçbir yere gönderilmez. Sonuç şarkı başına önbelleğe alınır. Atıf: `public/models/NOTICE.md`.
+Ortadaki yaz�, �alan �ark�n�n vuru�lar�na [Beat This!](https://github.com/CPJKU/beat_this) (small0, MIT) modeliyle senkron titrer. Model taray�c�da `onnxruntime-web` ile yerelde �al���r, ses hi�bir yere g�nderilmez. Sonu� �ark� ba��na �nbelle�e al�n�r. At�f: `public/models/NOTICE.md`.
 
 ## Code signing policy
 
@@ -72,6 +72,7 @@ HANAMI plays files from your own device. Music and videos are never uploaded. Rh
 ### Installing and uninstalling
 
 The Windows installer (`HANAMI-Setup-*.exe`) adds a Start menu and desktop shortcut and registers an uninstaller under *Settings > Apps*. The portable build (`HANAMI-Portable-*.exe`) changes nothing on your system; delete the file to remove it.
+
 ## Lisans
 
 MIT
