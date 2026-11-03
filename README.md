@@ -63,17 +63,22 @@ Yapıldı:
 - [x] Android `.apk` (imzalı), arka planda çalma servisi ve bildirim düğmeleri
 - [x] Kütüphane kalıcılığı (şarkılar, favoriler, albümler, son çalınanlar), şarkıyı geri alınabilir kaldırma, kitaplığı temizleme
 - [x] Temayla uyumlu iPod: 8 tema için kasa, tekerlek, çıkartma, ritimle atan parıltı
+- [x] Android: cihazdaki müzikleri izinle kendiliğinden bulma (dosyalar kopyalanmaz), uygulamaya dönünce sessiz eşitleme
+- [x] Bildirimde ve kilit ekranında albüm kapağı (Android)
+- [x] Karıştır ve tekrar (tüm liste / tek şarkı / kapalı)
 
 Sırada:
 
 - [ ] **Windows kod imzası:** SignPath Foundation başvurusu hazır, başvuru bekleniyor
-- [ ] **APK'yı gerçek telefonda sınamak:** kurulum, arka planda çalma, bildirim düğmeleri henüz bir cihazda görülmedi
+- [ ] **APK'yı gerçek telefonda sınamak:** kurulum, müzik izni ve içe aktarma, ileri sarma, arka planda çalma, bildirim düğmeleri ve kapağı henüz bir cihazda görülmedi
+
+**Android izni:** Uygulama yalnızca müzik dosyalarını okumak için `READ_MEDIA_AUDIO` (Android 12 ve öncesinde `READ_EXTERNAL_STORAGE`) izni ister. Dosyalar kopyalanmaz, hiçbir yere gönderilmez; yalnızca liste ve ayarlar cihazda saklanır.
 - [ ] Windows taşınabilir sürümünün antivirüs uyarısı (imza ile çözülmesi beklenir)
 - [ ] Otomatik güncelleme kontrolü
 
 Fikirler (henüz planlanmadı):
 
-- [ ] Karıştır ve tekrar, sıradaki şarkılar paneli, arama ve sıralama
+- [ ] Sıradaki şarkılar paneli, arama ve sıralama
 - [ ] Şarkı adı ve sanatçıyı etiketlerden okuma, M4A kapak resmi
 - [ ] Kapaktan tema rengi, senkron söz (`.lrc`)
 

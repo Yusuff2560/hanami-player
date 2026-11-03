@@ -326,3 +326,7 @@ html[data-theme="snow"] .fx-switch input:checked::after { background: #fff; }
 .track { content-visibility: auto; contain-intrinsic-size: auto 60px; }
 .empty-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .btn:disabled { opacity: .55; cursor: default; }
+
+.mode-btn { opacity: .6; }
+.mode-btn.on { opacity: 1; color: var(--accent, currentColor); }
+.big-controls .mode-btn { background: transparent; border: 0; }

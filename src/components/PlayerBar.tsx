@@ -3,6 +3,7 @@ import { seekToPercent, useAudioProgress } from '../hooks';
 import { fmt, useStore } from '../store';
 import { Cover } from './Library';
 import Icon from './Icon';
+import { RepeatButton, ShuffleButton } from './ModeButtons';
 
 export function usePlayerInfo() {
   const tracks = useStore(s => s.tracks);
@@ -40,6 +41,9 @@ export default function PlayerBar() {
         </span>
       </button>
       <div className="controls">
+        <span className="ctrl-prev">
+          <ShuffleButton />
+        </span>
         <button className="ctrl ctrl-prev" aria-label="Önceki şarkı" onClick={playPrev}>
           <Icon name="prev" size={20} />
         </button>
@@ -49,6 +53,9 @@ export default function PlayerBar() {
         <button className="ctrl" aria-label="Sonraki şarkı" onClick={playNext}>
           <Icon name="next" size={20} />
         </button>
+        <span className="ctrl-prev">
+          <RepeatButton />
+        </span>
       </div>
       <div className="progress">
         <span>{fmt(time)}</span>

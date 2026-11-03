@@ -119,6 +119,10 @@ interface State {
 
   addFiles: (files: File[]) => void;
   playFromQueue: (queue: Track[], index: number, name?: string) => void;
+  shuffle: boolean;
+  repeat: 'all' | 'one' | 'off';
+  toggleShuffle: () => void;
+  cycleRepeat: () => void;
   playNext: () => void;
   playPrev: () => void;
   togglePlay: () => void;
@@ -174,6 +178,8 @@ export const useStore = create<State>((set, get) => ({
   playing: false,
   rhythmBusy: false,
   deviceScanning: false,
+  shuffle: false,
+  repeat: 'all',
   sidebarHidden: false,
   immersiveOpen: false,
   miniVisible: false,
@@ -278,7 +284,21 @@ export const useStore = create<State>((set, get) => ({
       if (tracks.length) playFromQueue(tracks, 0, 'Tüm müzikler');
       return;
     }
+    if (get().shuffle && queue.length > 1) {
+      let n = queueIndex;
+      while (n === queueIndex) n = Math.floor(Math.random() * queue.length);
+      playFromQueue(queue, n, queueName);
+      return;
+    }
     playFromQueue(queue, (queueIndex + 1) % queue.length, queueName);
+  },
+
+  toggleShuffle() {
+    set(s => ({ shuffle: !s.shuffle }));
+  },
+
+  cycleRepeat() {
+    set(s => ({ repeat: s.repeat === 'all' ? 'one' : s.repeat === 'one' ? 'off' : 'all' }));
   },
 
   playPrev() {
@@ -673,7 +693,17 @@ function patchTrack(id: number, patch: Partial<Track>) {
   useStore.setState(s => ({ tracks: s.tracks.map(t => (t.id === id ? { ...t, ...patch } : t)) }));
 }
 
-audio.onended = () => useStore.getState().playNext();
+audio.onended = () => {
+  const s = useStore.getState();
+  if (s.repeat === 'one') {
+    audio.currentTime = 0;
+    void audio.play();
+  } else if (s.repeat === 'off' && !s.shuffle && s.queueIndex >= s.queue.length - 1) {
+    useStore.setState({ playing: false });
+  } else {
+    s.playNext();
+  }
+};
 audio.onplay = () => {
   useStore.setState({ playing: true });
   startVisualizer();

@@ -45,6 +45,7 @@ public class PlaybackService extends Service {
     private PowerManager.WakeLock wakeLock;
     private String title = "HANAMI";
     private String artist = "";
+    private android.graphics.Bitmap cover = null;
     private boolean playing = false;
     private boolean foreground = false;
 
@@ -83,6 +84,8 @@ public class PlaybackService extends Service {
                     title = valueOr(intent.getStringExtra("title"), "HANAMI");
                     artist = valueOr(intent.getStringExtra("artist"), "");
                     playing = intent.getBooleanExtra("playing", false);
+                    byte[] bytes = intent.getByteArrayExtra("cover");
+                    cover = bytes == null ? null : android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
                 show();
                 return START_NOT_STICKY;
@@ -118,6 +121,7 @@ public class PlaybackService extends Service {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(artist)
+                .setLargeIcon(cover)
                 .setContentIntent(content)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)

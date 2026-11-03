@@ -41,6 +41,14 @@ public class PlaybackPlugin extends Plugin {
         Intent i = new Intent(ctx, PlaybackService.class).setAction(PlaybackService.ACTION_UPDATE);
         i.putExtra("title", call.getString("title", "HANAMI"));
         i.putExtra("artist", call.getString("artist", ""));
+        String cover = call.getString("cover", "");
+        if (!cover.isEmpty()) {
+            try {
+                i.putExtra("cover", android.util.Base64.decode(cover, android.util.Base64.DEFAULT));
+            } catch (IllegalArgumentException ignored) {
+                // bozuk kapak verisi: kapaksız devam
+            }
+        }
         i.putExtra("playing", Boolean.TRUE.equals(call.getBoolean("playing", false)));
         try {
             // Uygulama ön plandayken başlatılır; servis hemen startForeground çağırır

@@ -3,6 +3,7 @@ import { audio } from '../engine/audio';
 import { seekToPercent, useAudioProgress, useSwipeDown } from '../hooks';
 import { fmt, useStore } from '../store';
 import Icon from './Icon';
+import { RepeatButton, ShuffleButton } from './ModeButtons';
 import { Cover } from './Library';
 import { usePlayerInfo } from './PlayerBar';
 
@@ -76,6 +77,7 @@ export default function Immersive() {
           <span>{fmt(duration)}</span>
         </div>
         <div className="big-controls">
+          <ShuffleButton size={22} />
           <button aria-label="Önceki şarkı" onClick={playPrev}>
             <Icon name="prev" size={26} />
           </button>
@@ -85,6 +87,7 @@ export default function Immersive() {
           <button aria-label="Sonraki şarkı" onClick={playNext}>
             <Icon name="next" size={26} />
           </button>
+          <RepeatButton size={22} />
         </div>
         <div className="player-extra">
           <button

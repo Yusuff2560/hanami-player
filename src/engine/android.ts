@@ -107,7 +107,7 @@ export async function startDeviceMusic() {
 }
 
 interface HanamiPlayback {
-  update(options: { title: string; artist: string; playing: boolean }): Promise<void>;
+  update(options: { title: string; artist: string; playing: boolean; cover?: string }): Promise<void>;
   stop(): Promise<void>;
   ensureNotificationPermission(): Promise<void>;
   addListener(event: 'action', cb: (e: { action: string }) => void): Promise<PluginListenerHandle>;
@@ -130,7 +130,7 @@ export function initAndroid(): () => void {
       return;
     }
     const artist = state.queueName && state.queueName !== 'Tüm müzikler' ? state.queueName : 'HANAMI';
-    const key = `${track.id}|${state.playing}|${artist}`;
+    const key = `${track.id}|${state.playing}|${artist}|${track.coverBlob ? 1 : 0}`;
     if (key === lastKey) return;
     lastKey = key;
     void (async () => {
@@ -138,7 +138,8 @@ export function initAndroid(): () => void {
         permissionAsked = true;
         await Playback.ensureNotificationPermission().catch(() => {});
       }
-      await Playback.update({ title: track.name, artist, playing: state.playing }).catch(() => {});
+      const cover = await coverForNotification(track.coverBlob);
+      await Playback.update({ title: track.name, artist, playing: state.playing, cover }).catch(() => {});
     })();
   });
   cleanups.push(unsubscribe);
@@ -170,4 +171,21 @@ export function initAndroid(): () => void {
   }).then(h => cleanups.push(() => void h.remove()));
 
   return () => cleanups.forEach(fn => fn());
+}
+
+/** Bildirim ve kilit ekranı için kapağı en fazla 320 px JPEG'e küçültür (base64) */
+async function coverForNotification(blob: Blob | null): Promise<string | undefined> {
+  if (!blob) return undefined;
+  try {
+    const bmp = await createImageBitmap(blob);
+    const k = Math.min(1, 320 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(bmp.width * k));
+    c.height = Math.max(1, Math.round(bmp.height * k));
+    c.getContext('2d')?.drawImage(bmp, 0, 0, c.width, c.height);
+    bmp.close();
+    return c.toDataURL('image/jpeg', 0.85).split(',')[1];
+  } catch {
+    return undefined;
+  }
 }
