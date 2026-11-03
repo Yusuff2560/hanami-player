@@ -1,7 +1,7 @@
 {
   "name": "hanami-player",
   "private": true,
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "HANAMI - local music & video player with audio-reactive Japanese typography and seasonal environments",
   "author": "Yusuff2560",
   "license": "MIT",

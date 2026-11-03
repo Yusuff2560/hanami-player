@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { importDeviceMusic } from '../engine/android';
+import { isAndroidApp } from '../engine/deviceMusic';
 import { fmt, useStore, type Album, type Track } from '../store';
 import Icon from './Icon';
 
@@ -93,6 +95,8 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
 
   const currentTrack = tracks[current];
   const favCount = tracks.filter(t => t.fav).length;
+  const scanning = useStore(s => s.deviceScanning);
+  const android = isAndroidApp();
   const album = view === 'albums' && activeAlbumId !== null ? albums.find(a => a.id === activeAlbumId) : undefined;
 
   const pageTitle = album
@@ -235,8 +239,9 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
 
     if (!list.length) {
       let title = 'HANAMI kitaplığın henüz boş';
-      let message =
-        'Bilgisayarından müzik dosyaları veya bir müzik klasörü ekleyerek başlayabilirsin. Dosyaların bilgisayarından silinmez veya taşınmaz.';
+      let message = android
+        ? 'Telefonundaki müzikleri kendiliğinden bulabilirim ya da dosyaları kendin seçebilirsin. Dosyaların kopyalanmaz, hiçbir yere gönderilmez.'
+        : 'Bilgisayarından müzik dosyaları veya bir müzik klasörü ekleyerek başlayabilirsin. Dosyaların bilgisayarından silinmez veya taşınmaz.';
       if (tracks.length) {
         if (view === 'favorites') {
           title = 'Henüz favori şarkı eklemedin';
@@ -253,9 +258,20 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
             title={title}
             message={message}
             action={
-              <button className="btn primary" onClick={onPickFiles}>
-                Müzik seç
-              </button>
+              android && view === 'music' && !tracks.length ? (
+                <div className="empty-actions">
+                  <button className="btn primary" disabled={scanning} onClick={() => void importDeviceMusic()}>
+                    {scanning ? 'Müzikler aranıyor…' : 'Cihazdaki müzikleri bul'}
+                  </button>
+                  <button className="btn" onClick={onPickFiles}>
+                    Dosya seç
+                  </button>
+                </div>
+              ) : (
+                <button className="btn primary" onClick={onPickFiles}>
+                  Müzik seç
+                </button>
+              )
             }
           />
         </div>
@@ -270,7 +286,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
               index={i}
               isCurrent={currentTrack === t}
               playing={playing}
-              subtitle="Yerel dosya"
+              subtitle={t.artist || 'Yerel dosya'}
               onPlay={() => playFromQueue(list, i, titles.list)}
               onRemove={() => removeTrack(t.id)}
               removeLabel="kitaplıktan kaldır"

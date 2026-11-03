@@ -1,6 +1,8 @@
 import { themeOptions, themes } from '../engine/themes';
 import { setJpGain } from '../engine/audio';
 import { useEffect, useState } from 'react';
+import { importDeviceMusic } from '../engine/android';
+import { isAndroidApp } from '../engine/deviceMusic';
 import { storageEstimate } from '../library';
 import { useStore } from '../store';
 import Icon from './Icon';
@@ -62,6 +64,7 @@ export function ToolButtons({ onPickFiles, onPickFolder, onNavigate }: ToolProps
   const reduceFlash = useStore(s => s.reduceFlash);
   const miniVisible = useStore(s => s.miniVisible);
   const ipodVisible = useStore(s => s.ipodVisible);
+  const scanning = useStore(s => s.deviceScanning);
   const { openModal, setMini, setIpod, setFxGain, setReduceFlash } = useStore.getState();
   const after = (fn: () => void) => () => {
     fn();
@@ -94,6 +97,14 @@ export function ToolButtons({ onPickFiles, onPickFolder, onNavigate }: ToolProps
         </span>
         Klasör ekle
       </button>
+      {isAndroidApp() && (
+        <button className="btn" disabled={scanning} onClick={after(() => void importDeviceMusic())}>
+          <span className="tool-icon">
+            <Icon name="music" size={16} />
+          </span>
+          {scanning ? 'Müzikler aranıyor…' : 'Cihazdaki müzikleri tara'}
+        </button>
+      )}
       <button className="btn primary" onClick={after(onPickFiles)}>
         <span className="tool-icon">
           <Icon name="plus" size={16} />

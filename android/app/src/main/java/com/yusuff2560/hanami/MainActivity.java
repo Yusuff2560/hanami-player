@@ -8,6 +8,9 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(PlaybackPlugin.class);
+        registerPlugin(MediaPlugin.class);
         super.onCreate(savedInstanceState);
+        // Cihazdaki müzikleri doğru Range desteğiyle sunan istek yakalayıcı
+        getBridge().setWebViewClient(new MediaWebViewClient(getBridge(), this));
     }
 }

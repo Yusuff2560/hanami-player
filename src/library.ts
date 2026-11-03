@@ -8,7 +8,11 @@ export interface TrackRecord {
   size: number;
   lastModified: number;
   type: string;
-  file: Blob;
+  /** Seçilen dosyanın kendisi; cihaz müziğinde (mediaId) null: dosya cihazda kalır, kopyalanmaz */
+  file: Blob | null;
+  /** Android MediaStore kimliği (yalnızca cihaz müziği) */
+  mediaId?: number;
+  artist?: string;
   fav: boolean;
   durationSec: number;
   cover: Blob | null;
@@ -17,6 +21,8 @@ export interface TrackRecord {
 
 export interface LibraryMeta {
   recent: number[];
+  /** Kullanıcının kitaplıktan kaldırdığı cihaz müzikleri (MediaStore kimlikleri): yeniden taramada eklenmez */
+  hidden?: number[];
 }
 
 const DB_NAME = 'hanami-library';
@@ -80,6 +86,40 @@ export async function libPut(record: TrackRecord): Promise<boolean> {
       tx.onabort = () => resolve(false);
     } catch {
       resolve(false);
+    }
+  });
+}
+
+/** Binlerce kaydı tek işlemde yazar (cihaz müziği taraması) */
+export async function libPutMany(records: TrackRecord[]): Promise<boolean> {
+  const db = await openDb();
+  if (!db) return false;
+  return new Promise(resolve => {
+    try {
+      const tx = db.transaction(TRACKS, 'readwrite');
+      const store = tx.objectStore(TRACKS);
+      records.forEach(r => store.put(r));
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+      tx.onabort = () => resolve(false);
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
+export async function libDeleteMany(ids: number[]): Promise<void> {
+  const db = await openDb();
+  if (!db) return;
+  await new Promise<void>(resolve => {
+    try {
+      const tx = db.transaction(TRACKS, 'readwrite');
+      ids.forEach(id => tx.objectStore(TRACKS).delete(id));
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+      tx.onabort = () => resolve();
+    } catch {
+      resolve();
     }
   });
 }

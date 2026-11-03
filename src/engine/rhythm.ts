@@ -207,24 +207,37 @@ function buildRhythm(d: BeatData): BeatRhythm {
 const cache = new Map<number, Rhythm | null>();
 const inflight = new Map<number, Promise<Rhythm | null>>();
 
-export function analyzeTrack(id: number, file: File): Promise<Rhythm | null> {
+/** Bir şarkının ham baytlarına erişim: seçilen dosya ya da cihaz müziği (adresten okunur) */
+export interface TrackSource {
+  /** Önbellek anahtarı (aynı dosya aynı anahtarı üretmeli) */
+  key: string;
+  size: number;
+  load: () => Promise<Blob>;
+}
+
+export function analyzeTrack(id: number, src: TrackSource): Promise<Rhythm | null> {
   if (cache.has(id)) return Promise.resolve(cache.get(id)!);
   const running = inflight.get(id);
   if (running) return running;
 
   const job = (async (): Promise<Rhythm | null> => {
-    if (file.size <= MAX_BYTES) {
-      const key = `${file.name}|${file.size}|${file.lastModified}`;
+    if (src.size <= MAX_BYTES) {
+      const key = src.key;
       try {
         const cached = await cacheGet(key);
-        const data = cached ?? (await runModel(file));
+        const data = cached ?? (await runModel(await src.load()));
         if (!cached) void cachePut(key, data);
         if (data.beats.length >= 4) return buildRhythm(data);
       } catch (err) {
         console.warn('Ritim modeli çalışmadı, enerji analizine düşülüyor:', err);
       }
     }
-    const energy = await analyzeEnergy(id, file);
+    let energy = null;
+    try {
+      energy = await analyzeEnergy(id, await src.load());
+    } catch (err) {
+      console.warn('Enerji analizi de çalışmadı:', err);
+    }
     return energy ? { kind: 'energy', energy } : null;
   })().then(r => {
     cache.set(id, r);

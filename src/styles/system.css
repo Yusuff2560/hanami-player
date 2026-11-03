@@ -321,3 +321,8 @@ html[data-theme="snow"] .fx-switch input:checked::after { background: #fff; }
 .sidebar { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .2) transparent; }
 .sidebar-foot { flex: none; }
 #mainApp[data-theme="snow"] .sidebar { scrollbar-color: rgba(53, 85, 122, .3) transparent; }
+
+/* Binlerce şarkıda kaydırma akıcı kalsın: ekran dışı satırların düzeni ve boyaması atlanır */
+.track { content-visibility: auto; contain-intrinsic-size: auto 60px; }
+.empty-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn:disabled { opacity: .55; cursor: default; }
