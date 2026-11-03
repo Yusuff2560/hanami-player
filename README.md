@@ -73,6 +73,15 @@ HANAMI plays files from your own device. Music and videos are never uploaded. Rh
 
 The Windows installer (`HANAMI-Setup-*.exe`) adds a Start menu and desktop shortcut and registers an uninstaller under *Settings > Apps*. The portable build (`HANAMI-Portable-*.exe`) changes nothing on your system; delete the file to remove it.
 
+### Antivirus and SmartScreen warnings
+
+The Windows binaries are not code-signed yet (see the status above), and they are new, rarely downloaded files. Some antivirus programs rate such files with reputation-based heuristics and may warn or quarantine them. This was observed with Avast (`IDP.HELU.PSD11`, Behavior Shield) on `HANAMI-Portable-0.3.2.exe`, which is a self-extracting executable that unpacks itself to a temporary folder. The installer was not flagged in the same test. We believe this is a false positive, but we cannot prove it for you, so please verify the file yourself:
+
+- Use the **installer** (`HANAMI-Setup-*.exe`) if you can; it is less likely to be flagged than the portable build.
+- Compare the SHA256 of your download with the digest GitHub shows next to each file on the [Releases](https://github.com/Yusuff2560/hanami-player/releases) page (PowerShell: `Get-FileHash .\HANAMI-Setup-0.3.2.exe`). It must match exactly.
+- Everything is built from this repository by GitHub Actions; you can read the source and the build workflow, or build it yourself with `npm run electron:pack`.
+- If your antivirus blocks it and you do not trust it, do not run it.
+
 ## Lisans
 
 MIT
