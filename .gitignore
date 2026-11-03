@@ -17,3 +17,6 @@ Thumbs.db
 *.mp4
 *.mov
 *.webm
+
+.vercel
+.env*
