@@ -30,7 +30,7 @@ legacy/       taşıma öncesi tek dosyalık v11 sürümü (referans)
 - [x] Tek dosyalık ilk sürüm
 - [x] Vite + React + TypeScript'e taşıma
 - [ ] Erişilebilirlik ve Apple HIG düzeltmeleri
-- [ ] Ritme göre değişen kanji
+- [x] Ritimle titreyen kanji
 - [ ] Temayla uyumlu mini video oynatıcı
 - [ ] Electron ile Windows `.exe`
 - [ ] Capacitor ile Android `.apk`

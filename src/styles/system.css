@@ -21,6 +21,16 @@ html, body {
 }
 .app { height: 100vh; height: 100dvh; }
 
+/* ---------- Ortadaki yazı: ritimle titreme (JS --shake-* değişkenlerini yazar) ---------- */
+#mainApp #jpWordVisualizer.jp-word {
+  --shake-x: 0px; --shake-y: 0px; --shake-r: 0deg;
+  transform:
+    translate(-50%, -50%)
+    translate(var(--shake-x), var(--shake-y))
+    rotate(var(--shake-r))
+    scale(calc(1 + var(--bass) * .02 + var(--beat) * .055));
+}
+
 /* ---------- Odak ---------- */
 :focus-visible {
   outline: 2px solid var(--focus);

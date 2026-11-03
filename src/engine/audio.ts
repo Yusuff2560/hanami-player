@@ -112,6 +112,18 @@ export function startVisualizer() {
   }
 }
 
+// Titreme: bas ve vuruşla büyüyen, hızlı ve birbirinden bağımsız üç salınım (x, y, dönme).
+// Hareket tercihi kapalıysa ya da "ışık azaltma" açıksa tamamen sıfırlanır.
+const SHAKE_MAX_PX = 5;
+function writeShake(now: number, bass: number, beat: number, enabled: boolean) {
+  if (!vizTarget) return;
+  const amp = enabled ? Math.min(SHAKE_MAX_PX, Math.pow(bass, 1.6) * 2.4 + beat * 3) : 0;
+  const t = now / 1000;
+  vizTarget.style.setProperty('--shake-x', (Math.sin(t * 2 * Math.PI * 17) * amp).toFixed(2) + 'px');
+  vizTarget.style.setProperty('--shake-y', (Math.sin(t * 2 * Math.PI * 23 + 1.3) * amp * 0.6).toFixed(2) + 'px');
+  vizTarget.style.setProperty('--shake-r', (Math.sin(t * 2 * Math.PI * 13 + 2.1) * amp * 0.07).toFixed(3) + 'deg');
+}
+
 function writeVars(bass: number, beat: number, treb: number) {
   if (!vizTarget) return;
   vizTarget.style.setProperty('--bass', bass.toFixed(3));
@@ -162,6 +174,7 @@ function frame(now: number) {
   if (!playing && viz.bass < 0.004 && viz.beat < 0.004 && viz.treb < 0.004) {
     viz.bass = viz.beat = viz.treb = 0;
     writeVars(0, 0, 0);
+    writeShake(now, 0, 0, false);
     running = false;
     return;
   }
@@ -169,6 +182,7 @@ function frame(now: number) {
   const g = Math.min(1.6, gain) * (reduceMotionQuery?.matches ? 0.45 : 1);
   // Işık azaltma açıkken sert vuruş parlaması kapanır, sürekli bas nabzı yarıya iner.
   writeVars(viz.bass * g * (reduceFlash ? 0.5 : 1), reduceFlash ? 0 : viz.beat * g, viz.treb * g * (reduceFlash ? 0.5 : 1));
+  writeShake(now, viz.bass * g, viz.beat * g, !reduceFlash && !reduceMotionQuery?.matches);
   requestAnimationFrame(frame);
 }
 
