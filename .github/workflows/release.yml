@@ -1,4 +1,4 @@
-﻿name: Release
+name: Release
 
 on:
   push:
@@ -59,6 +59,9 @@ jobs:
 
       - name: Decode signing key
         run: echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > "$RUNNER_TEMP/hanami-release.jks"
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
 
       - name: Build signed APK
         working-directory: android
