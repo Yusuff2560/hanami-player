@@ -1,55 +1,83 @@
 # HANAMI 花見
 
-Yerel müzik ve video çalar. Müziğin ritmine göre nefes alan Japonca bir kelime, mevsime göre değişen yağmur, kar ve yaprak ortamları.
+Yerel müzik ve video çalar. Çalan şarkının ritmine göre titreyen büyük bir Japonca kelime, seçtiğin mevsime göre değişen yağmur, kar ve yaprak ortamları.
 
-Dosyaların bilgisayarından hiçbir yere yüklenmez; her şey tarayıcıda (veya masaüstü uygulamasında) yerelde çalışır.
+Dosyaların cihazından hiçbir yere yüklenmez; her şey tarayıcıda, masaüstü uygulamasında veya telefonda yerelde çalışır.
 
-**Canlı:** https://hanami-player.vercel.app
+| Platform | Nereden |
+|---|---|
+| Web | https://hanami-player.vercel.app |
+| Windows | [Son sürüm](https://github.com/Yusuff2560/hanami-player/releases/latest): `HANAMI-Setup-*.exe` (kurulum), `HANAMI-Portable-*.exe` (kurulumsuz) |
+| Android | [Son sürüm](https://github.com/Yusuff2560/hanami-player/releases/latest): `HANAMI-*.apk` (bilinmeyen kaynaklardan kurulum izni gerekir) |
+
+## Özellikler
+
+- Şarkı, klasör (masaüstü) ve video ekleme; albümler, favoriler, son çalınanlar
+- Ritimle titreyen kelime: [Beat This!](https://github.com/CPJKU/beat_this) yapay zeka modeli (small, ~2 milyon parametre) şarkının vuruşlarını bulur, yazı tam o anlarda sarsılır
+- 8 mevsim teması, tam ekran oynatıcı, mini video oynatıcı
+- Klavye kısayolları, medya tuşları, yerel menü çubuğu (masaüstü), bildirimden denetim ve arka planda çalma (Android)
+- Erişilebilirlik: klavyeyle gezinme, ekran okuyucu adları, hareketi azaltma ve "ışık yanıp sönmesini azalt" ayarı
+- Telefon düzeni: alt sekme çubuğu, alt sayfalar (sheet), güvenli alanlar
 
 ## Geliştirme
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm run build      # dist/ klasörüne üretim derlemesi
+npm run dev            # http://localhost:5173
+npm run build          # dist/ klasörüne üretim derlemesi
 npm run typecheck
+npm run electron:dev   # derleyip Electron'da aç
+npm run electron:pack  # release/ klasörüne Windows kurulum ve taşınabilir exe üret
+npm run android:sync   # web uygulamasını Android projesine aktar
 ```
+
+Android APK'yı yerelde derlemek için JDK 21 ve Android SDK gerekir; sürümlerde GitHub Actions derler.
 
 ## Yapı
 
 ```
 src/
-  engine/     arayüzden bağımsız motorlar (ses analizi, parçacık ortamı, temalar, ID3)
-  components/ React bileşenleri
-  store.ts    uygulama durumu (zustand)
-legacy/       taşıma öncesi tek dosyalık v11 sürümü (referans)
+  engine/       arayüzden bağımsız motorlar: ses analizi, parçacık ortamı, temalar,
+                ritim modeli (beatCore, beatWorker, rhythm), Android ve masaüstü köprüleri
+  components/   React bileşenleri
+  store.ts      uygulama durumu (zustand)
+electron/       masaüstü kabuğu (ana süreç, güvenli ön yükleme betiği)
+android/        Capacitor Android projesi (arka planda çalma servisi dahil)
+public/models/  Beat This! ONNX modelleri ve atıf (MIT)
+scripts/        derleme yardımcıları
+legacy/         taşıma öncesi tek dosyalık v11 sürümü (referans)
 ```
 
 ## Yol haritası
 
+Yapıldı:
+
 - [x] Tek dosyalık ilk sürüm
 - [x] Vite + React + TypeScript'e taşıma
-- [ ] Erişilebilirlik ve Apple HIG düzeltmeleri
-- [x] Ritimle titreyen kanji (yapay zeka vuru� izleyici: Beat This! small0, ~2M parametre)
-- [ ] Temayla uyumlu mini video oynatıcı
-- [x] Electron ile Windows `.exe` (kurulum + ta��nabilir)
-- [ ] Capacitor ile Android `.apk`
+- [x] Erişilebilirlik ve Apple HIG düzeltmeleri, telefon düzeni
+- [x] Ritimle titreyen kelime (yapay zeka vuruş izleyici)
+- [x] Yazı tipleri uygulamanın içinde, çalışırken ağ isteği yok
+- [x] Windows `.exe` (kurulum + taşınabilir), GitHub Actions ile otomatik sürüm
+- [x] Android `.apk` (imzalı), arka planda çalma servisi ve bildirim düğmeleri
 
+Sırada:
 
-## Masa�st� (Windows)
+- [ ] **Kütüphane kalıcılığı:** şarkı listesi ve albümler uygulamayı kapatınca kayboluyor (en büyük eksik)
+- [ ] **Temayla uyumlu mini video oynatıcı:** her temaya göre kasa tasarımı, ekran parıltısı
+- [ ] **Windows kod imzası:** SignPath Foundation başvurusu hazır, başvuru bekleniyor
+- [ ] **APK'yı gerçek telefonda sınamak:** kurulum, arka planda çalma, bildirim düğmeleri henüz bir cihazda görülmedi
+- [ ] Windows taşınabilir sürümünün antivirüs uyarısı (imza ile çözülmesi beklenir)
+- [ ] Otomatik güncelleme kontrolü
 
-S�r�mler: https://github.com/Yusuff2560/hanami-player/releases (`HANAMI-Setup-*.exe` kurulum, `HANAMI-Portable-*.exe` kurulumsuz).
-Uygulama imzas�zd�r; ilk a��l��ta Windows SmartScreen "Daha fazla bilgi > Yine de �al��t�r" diyebilir.
+Fikirler (henüz planlanmadı):
 
-```bash
-npm run electron:dev    # derleyip Electron'da a�
-npm run electron:pack   # release/ klas�r�ne kurulum ve ta��nabilir exe �ret
-```
+- [ ] Karıştır ve tekrar, sıradaki şarkılar paneli, arama ve sıralama
+- [ ] Şarkı adı ve sanatçıyı etiketlerden okuma, M4A kapak resmi
+- [ ] Kapaktan tema rengi, senkron söz (`.lrc`)
 
-Yeni s�r�m yay�nlamak i�in: `git tag v0.2.0 && git push --tags` (GitHub Actions derleyip Releases'e y�kler).
 ## Ritim modeli
 
-Ortadaki yaz�, �alan �ark�n�n vuru�lar�na [Beat This!](https://github.com/CPJKU/beat_this) (small0, MIT) modeliyle senkron titrer. Model taray�c�da `onnxruntime-web` ile yerelde �al���r, ses hi�bir yere g�nderilmez. Sonu� �ark� ba��na �nbelle�e al�n�r. At�f: `public/models/NOTICE.md`.
+Ortadaki yazı, çalan şarkının vuruşlarına [Beat This!](https://github.com/CPJKU/beat_this) (small0, MIT) modeliyle senkron titrer. Model tarayıcıda, masaüstünde ve telefonda `onnxruntime-web` ile yerelde çalışır, ses hiçbir yere gönderilmez. Bir şarkıda ilk analiz birkaç on saniye sürer (3 dakikalık şarkıda yaklaşık 20 saniye); sonuç şarkı başına önbelleğe alınır ve sıradaki şarkı arka planda önceden analiz edilir. Analiz bitene kadar yazı sakin kalır. Model yüklenemezse basit bir enerji analizine düşülür. Atıf: `public/models/NOTICE.md`.
 
 ## Code signing policy
 
@@ -82,6 +110,14 @@ The Windows binaries are not code-signed yet (see the status above), and they ar
 - Everything is built from this repository by GitHub Actions; you can read the source and the build workflow, or build it yourself with `npm run electron:pack`.
 - If your antivirus blocks it and you do not trust it, do not run it.
 
+## Yeni sürüm yayınlamak
+
+```bash
+git tag v0.3.3 && git push origin v0.3.3
+```
+
+GitHub Actions Windows `.exe` dosyalarını ve imzalı Android `.apk` dosyasını derleyip Releases'e yükler.
+
 ## Lisans
 
-MIT
+MIT. Ritim modelleri (Beat This! small0) de MIT lisanslıdır, atıf `public/models/NOTICE.md` içindedir.
