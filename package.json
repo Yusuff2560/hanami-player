@@ -1,85 +1,85 @@
 {
-    "name":  "hanami-player",
-    "private":  true,
-    "version":  "0.3.2",
-    "description":  "HANAMI - local music \u0026 video player with audio-reactive Japanese typography and seasonal environments",
-    "author":  "Yusuff2560",
-    "license":  "MIT",
-    "type":  "module",
-    "scripts":  {
-                    "dev":  "vite",
-                    "build":  "tsc --noEmit \u0026\u0026 vite build \u0026\u0026 node scripts/prune-dist.mjs",
-                    "preview":  "vite preview",
-                    "typecheck":  "tsc --noEmit",
-                    "predev":  "node scripts/copy-ort.mjs",
-                    "prebuild":  "node scripts/copy-ort.mjs",
-                    "electron:dev":  "vite build \u0026\u0026 electron .",
-                    "electron:pack":  "npm run build \u0026\u0026 electron-builder --win nsis portable --x64 --publish never",
-                    "android:sync":  "npm run build \u0026\u0026 cap sync android"
-                },
-    "devDependencies":  {
-                            "@capacitor/android":  "^8.6.0",
-                            "@capacitor/app":  "^8.1.2",
-                            "@capacitor/cli":  "^8.6.0",
-                            "@capacitor/core":  "^8.6.0",
-                            "@fontsource/shippori-mincho-b1":  "^5.3.0",
-                            "@fontsource/zen-kaku-gothic-new":  "^5.3.1",
-                            "@types/react":  "^19.0.0",
-                            "@types/react-dom":  "^19.0.0",
-                            "@vitejs/plugin-react":  "^5.0.0",
-                            "electron":  "^45.2.1",
-                            "electron-builder":  "^26.18.0",
-                            "motion":  "^12.0.0",
-                            "onnxruntime-web":  "^1.31.1",
-                            "react":  "^19.0.0",
-                            "react-dom":  "^19.0.0",
-                            "typescript":  "^5.7.0",
-                            "vite":  "^7.0.0",
-                            "zustand":  "^5.0.0"
-                        },
-    "main":  "electron/main.cjs",
-    "homepage":  "https://github.com/Yusuff2560/hanami-player",
-    "build":  {
-                  "appId":  "com.yusuff2560.hanami",
-                  "productName":  "HANAMI",
-                  "copyright":  "Copyright Â© 2026 Yusuff2560",
-                  "directories":  {
-                                      "output":  "release",
-                                      "buildResources":  "build"
-                                  },
-                  "files":  [
-                                "dist/**/*",
-                                "electron/**/*",
-                                "package.json"
-                            ],
-                  "asar":  true,
-                  "win":  {
-                              "icon":  "build/icon.png",
-                              "target":  [
-                                             {
-                                                 "target":  "nsis",
-                                                 "arch":  [
-                                                              "x64"
-                                                          ]
-                                             },
-                                             {
-                                                 "target":  "portable",
-                                                 "arch":  [
-                                                              "x64"
-                                                          ]
-                                             }
-                                         ]
-                          },
-                  "nsis":  {
-                               "oneClick":  false,
-                               "allowToChangeInstallationDirectory":  true,
-                               "perMachine":  false,
-                               "createDesktopShortcut":  true,
-                               "shortcutName":  "HANAMI",
-                               "artifactName":  "HANAMI-Setup-${version}.${ext}"
-                           },
-                  "portable":  {
-                                   "artifactName":  "HANAMI-Portable-${version}.${ext}"
-                               }
-              }
+  "name": "hanami-player",
+  "private": true,
+  "version": "0.3.3",
+  "description": "HANAMI - local music & video player with audio-reactive Japanese typography and seasonal environments",
+  "author": "Yusuff2560",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/prune-dist.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "predev": "node scripts/copy-ort.mjs",
+    "prebuild": "node scripts/copy-ort.mjs",
+    "electron:dev": "vite build && electron .",
+    "electron:pack": "npm run build && electron-builder --win nsis portable --x64 --publish never",
+    "android:sync": "npm run build && cap sync android"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@fontsource/shippori-mincho-b1": "^5.3.0",
+    "@fontsource/zen-kaku-gothic-new": "^5.3.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0",
+    "motion": "^12.0.0",
+    "onnxruntime-web": "^1.31.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^7.0.0",
+    "zustand": "^5.0.0"
+  },
+  "main": "electron/main.cjs",
+  "homepage": "https://github.com/Yusuff2560/hanami-player",
+  "build": {
+    "appId": "com.yusuff2560.hanami",
+    "productName": "HANAMI",
+    "copyright": "Copyright Â© 2026 Yusuff2560",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "shortcutName": "HANAMI",
+      "artifactName": "HANAMI-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "HANAMI-Portable-${version}.${ext}"
+    }
+  }
 }
