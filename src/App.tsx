@@ -11,7 +11,7 @@ import Sidebar from './components/Sidebar';
 import TabBar from './components/TabBar';
 import Toast from './components/Toast';
 import { createAmbient, type AmbientHandle } from './engine/ambient';
-import { setJpGain, setReduceFlash } from './engine/audio';
+import { audio, setJpGain, setReduceFlash } from './engine/audio';
 import { initMediaSession } from './engine/mediaSession';
 import { initShortcuts } from './engine/shortcuts';
 import { themes } from './engine/themes';
@@ -44,6 +44,7 @@ export default function App() {
   const immersiveOpen = useStore(s => s.immersiveOpen);
   const ipodVisible = useStore(s => s.ipodVisible);
   const reduceFlash = useStore(s => s.reduceFlash);
+  const sidebarHidden = useStore(s => s.sidebarHidden);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ambientRef = useRef<AmbientHandle | null>(null);
   const themeRef = useRef(theme);
@@ -58,6 +59,27 @@ export default function App() {
 
   const pickFiles = () => fileInput.current?.click();
   const pickFolder = () => folderInput.current?.click();
+
+  // Masaüstü (Electron) menü eylemleri
+  useEffect(() => {
+    const desktop = window.hanamiDesktop;
+    if (!desktop) return;
+    return desktop.onMenu(action => {
+      const s = useStore.getState();
+      switch (action) {
+        case 'add-files': return fileInput.current?.click();
+        case 'add-folder': return folderInput.current?.click();
+        case 'new-album': return s.openModal();
+        case 'toggle-play': return s.togglePlay();
+        case 'prev': return s.playPrev();
+        case 'next': return s.playNext();
+        case 'seek-back': return void (audio.currentTime = Math.max(0, audio.currentTime - 5));
+        case 'seek-forward': return void (audio.currentTime = Math.min(audio.duration || audio.currentTime, audio.currentTime + 5));
+        case 'toggle-player': return s.setImmersive(!s.immersiveOpen);
+        case 'toggle-sidebar': return s.toggleSidebar();
+      }
+    });
+  }, []);
 
   useEffect(() => {
     setJpGain(useStore.getState().fxGain);
@@ -107,7 +129,7 @@ export default function App() {
 
   return (
     <>
-      <div className="app" id="mainApp" data-theme={theme} style={{ background: t.bgGradient }}>
+      <div className={'app' + (sidebarHidden ? ' sidebar-hidden' : '')} id="mainApp" data-theme={theme} style={{ background: t.bgGradient }}>
         <Sidebar onPickFiles={pickFiles} onPickFolder={pickFolder} />
         <main className="main">
           <canvas id="ambientCanvas" ref={canvasRef} aria-hidden="true" style={{ display: immersiveOpen ? 'none' : 'block' }} />

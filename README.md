@@ -32,9 +32,21 @@ legacy/       taÅŸÄ±ma Ã¶ncesi tek dosyalÄ±k v11 sÃ¼rÃ¼mÃ¼ (referans)
 - [ ] EriÅŸilebilirlik ve Apple HIG dÃ¼zeltmeleri
 - [x] Ritimle titreyen kanji (yapay zeka vuruþ izleyici: Beat This! small0, ~2M parametre)
 - [ ] Temayla uyumlu mini video oynatÄ±cÄ±
-- [ ] Electron ile Windows `.exe`
+- [x] Electron ile Windows `.exe` (kurulum + taþýnabilir)
 - [ ] Capacitor ile Android `.apk`
 
+
+## Masaüstü (Windows)
+
+Sürümler: https://github.com/Yusuff2560/hanami-player/releases (`HANAMI-Setup-*.exe` kurulum, `HANAMI-Portable-*.exe` kurulumsuz).
+Uygulama imzasýzdýr; ilk açýlýþta Windows SmartScreen "Daha fazla bilgi > Yine de çalýþtýr" diyebilir.
+
+```bash
+npm run electron:dev    # derleyip Electron'da aç
+npm run electron:pack   # release/ klasörüne kurulum ve taþýnabilir exe üret
+```
+
+Yeni sürüm yayýnlamak için: `git tag v0.2.0 && git push --tags` (GitHub Actions derleyip Releases'e yükler).
 ## Ritim modeli
 
 Ortadaki yazý, çalan þarkýnýn vuruþlarýna [Beat This!](https://github.com/CPJKU/beat_this) (small0, MIT) modeliyle senkron titrer. Model tarayýcýda `onnxruntime-web` ile yerelde çalýþýr, ses hiçbir yere gönderilmez. Sonuç þarký baþýna önbelleðe alýnýr. Atýf: `public/models/NOTICE.md`.

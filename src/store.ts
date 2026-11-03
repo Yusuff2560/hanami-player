@@ -73,6 +73,7 @@ interface State {
   settingsOpen: boolean;
   playing: boolean;
   rhythmBusy: boolean;
+  sidebarHidden: boolean;
   immersiveOpen: boolean;
   miniVisible: boolean;
   ipodVisible: boolean;
@@ -92,6 +93,7 @@ interface State {
   notify: (message: string, action?: Toast['action']) => void;
   dismissToast: () => void;
   setSettingsOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
   setImmersive: (open: boolean) => void;
   setMini: (visible: boolean) => void;
   setIpod: (visible: boolean) => void;
@@ -125,6 +127,7 @@ export const useStore = create<State>((set, get) => ({
   settingsOpen: false,
   playing: false,
   rhythmBusy: false,
+  sidebarHidden: false,
   immersiveOpen: false,
   miniVisible: false,
   ipodVisible: false,
@@ -272,6 +275,10 @@ export const useStore = create<State>((set, get) => ({
 
   setSettingsOpen(open) {
     set({ settingsOpen: open });
+  },
+
+  toggleSidebar() {
+    set(s => ({ sidebarHidden: !s.sidebarHidden }));
   },
 
   setImmersive(open) {

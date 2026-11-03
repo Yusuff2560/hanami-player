@@ -291,3 +291,8 @@ html[data-theme="snow"] .fx-switch input:checked::after { background: #fff; }
 @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
 .playerbar-line { display: none; }
 @media (max-width: 767px) { .playerbar-line { display: block; } }
+
+/* Kenar çubuğu gizlenebilir (geniş düzen) */
+@media (min-width: 768px) {
+  .app.sidebar-hidden .sidebar { display: none; }
+}
