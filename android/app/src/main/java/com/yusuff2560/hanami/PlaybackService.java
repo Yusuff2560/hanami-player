@@ -1,4 +1,4 @@
-﻿package com.yusuff2560.hanami;
+package com.yusuff2560.hanami;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

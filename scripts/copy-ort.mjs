@@ -1,4 +1,4 @@
-﻿// onnxruntime-web'in wasm çalışma zamanını public/ort altına kopyalar (repoya girmez, derlemede üretilir).
+// onnxruntime-web'in wasm çalışma zamanını public/ort altına kopyalar (repoya girmez, derlemede üretilir).
 import { cpSync, mkdirSync, readdirSync } from 'node:fs';
 
 const src = 'node_modules/onnxruntime-web/dist';

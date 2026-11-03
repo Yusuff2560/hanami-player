@@ -1,4 +1,4 @@
-﻿package com.yusuff2560.hanami;
+package com.yusuff2560.hanami;
 
 import android.Manifest;
 import android.content.Context;
