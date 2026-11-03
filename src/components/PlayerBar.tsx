@@ -8,12 +8,14 @@ export function usePlayerInfo() {
   const tracks = useStore(s => s.tracks);
   const current = useStore(s => s.current);
   const queueName = useStore(s => s.queueName);
+  const busy = useStore(s => s.rhythmBusy);
   const track = tracks[current];
-  const artist = track
+  const base = track
     ? queueName && queueName !== 'Tüm müzikler'
       ? `${queueName} • Yerel müzik`
       : 'Yerel müzik'
     : 'Müzik ekleyerek başla';
+  const artist = track && busy ? `${base} • ritim analiz ediliyor…` : base;
   return { track, title: track?.name ?? 'Henüz şarkı seçilmedi', artist };
 }
 

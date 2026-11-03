@@ -30,10 +30,14 @@ legacy/       taÅŸÄ±ma Ã¶ncesi tek dosyalÄ±k v11 sÃ¼rÃ¼mÃ¼ (referans)
 - [x] Tek dosyalÄ±k ilk sÃ¼rÃ¼m
 - [x] Vite + React + TypeScript'e taÅŸÄ±ma
 - [ ] EriÅŸilebilirlik ve Apple HIG dÃ¼zeltmeleri
-- [x] Ritimle titreyen kanji
+- [x] Ritimle titreyen kanji (yapay zeka vuruş izleyici: Beat This! small0, ~2M parametre)
 - [ ] Temayla uyumlu mini video oynatÄ±cÄ±
 - [ ] Electron ile Windows `.exe`
 - [ ] Capacitor ile Android `.apk`
+
+## Ritim modeli
+
+Ortadaki yazı, çalan şarkının vuruşlarına [Beat This!](https://github.com/CPJKU/beat_this) (small0, MIT) modeliyle senkron titrer. Model tarayıcıda `onnxruntime-web` ile yerelde çalışır, ses hiçbir yere gönderilmez. Sonuç şarkı başına önbelleğe alınır. Atıf: `public/models/NOTICE.md`.
 
 ## Lisans
 

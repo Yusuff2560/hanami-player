@@ -72,6 +72,7 @@ interface State {
   toast: Toast | null;
   settingsOpen: boolean;
   playing: boolean;
+  rhythmBusy: boolean;
   immersiveOpen: boolean;
   miniVisible: boolean;
   ipodVisible: boolean;
@@ -123,6 +124,7 @@ export const useStore = create<State>((set, get) => ({
   toast: null,
   settingsOpen: false,
   playing: false,
+  rhythmBusy: false,
   immersiveOpen: false,
   miniVisible: false,
   ipodVisible: false,
@@ -183,9 +185,16 @@ export const useStore = create<State>((set, get) => ({
     audio.src = track.url;
     audio.play().then(startVisualizer).catch(() => {});
     setRhythm(null);
+    set({ rhythmBusy: true });
     analyzeTrack(track.id, track.file).then(r => {
       const now = get().tracks[get().current];
-      if (r && now && now.id === track.id) setRhythm(r);
+      if (!now || now.id !== track.id) return; // bu arada başka şarkıya geçildi
+      if (r) setRhythm(r);
+      set({ rhythmBusy: false });
+      // Sıradaki şarkıyı arka planda önceden analiz et ki geçince beklenmesin
+      const { queue, queueIndex } = get();
+      const next = queue[(queueIndex + 1) % queue.length];
+      if (next && next.id !== track.id) void analyzeTrack(next.id, next.file);
     });
     set(s => ({
       queue,

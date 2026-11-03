@@ -20,3 +20,8 @@ Thumbs.db
 
 .vercel
 .env*
+
+# Derlemede üretilir (onnxruntime-web wasm)
+public/ort/
+# Yerel test dosyaları
+public/__test/
