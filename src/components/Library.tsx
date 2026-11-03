@@ -34,7 +34,9 @@ function TrackRow({
   playing,
   subtitle,
   onPlay,
-  onRemove
+  onRemove,
+  removeLabel = 'albümden çıkar',
+  removeIcon = 'close'
 }: {
   track: Track;
   index: number;
@@ -43,6 +45,8 @@ function TrackRow({
   subtitle: string;
   onPlay: () => void;
   onRemove?: () => void;
+  removeLabel?: string;
+  removeIcon?: 'close' | 'trash';
 }) {
   const toggleFav = useStore.getState().toggleFav;
   return (
@@ -68,8 +72,8 @@ function TrackRow({
         <Icon name={track.fav ? 'heartFill' : 'heart'} size={18} />
       </button>
       {onRemove && (
-        <button className="track-remove-btn" aria-label={`${track.name} albümden çıkar`} onClick={onRemove}>
-          <Icon name="close" size={16} />
+        <button className="track-remove-btn" aria-label={`${track.name} ${removeLabel}`} onClick={onRemove}>
+          <Icon name={removeIcon} size={16} />
         </button>
       )}
     </div>
@@ -84,7 +88,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
   const current = useStore(s => s.current);
   const playing = useStore(s => s.playing);
   const activeAlbumId = useStore(s => s.activeAlbumId);
-  const { playFromQueue, setActiveAlbum, openModal, deleteAlbum, removeTrackFromAlbum, notify, setSettingsOpen } =
+  const { playFromQueue, setActiveAlbum, openModal, deleteAlbum, removeTrackFromAlbum, removeTrack, notify, setSettingsOpen } =
     useStore.getState();
 
   const currentTrack = tracks[current];
@@ -226,7 +230,7 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
       view === 'favorites'
         ? tracks.filter(t => t.fav)
         : view === 'recent'
-          ? recent.map(i => tracks[i]).filter(Boolean)
+          ? recent.map(id => tracks.find(t => t.id === id)).filter((t): t is Track => !!t)
           : tracks;
 
     if (!list.length) {
@@ -268,6 +272,9 @@ export default function Library({ onPickFiles }: { onPickFiles: () => void }) {
               playing={playing}
               subtitle="Yerel dosya"
               onPlay={() => playFromQueue(list, i, titles.list)}
+              onRemove={() => removeTrack(t.id)}
+              removeLabel="kitaplıktan kaldır"
+              removeIcon="trash"
             />
           ))}
         </div>

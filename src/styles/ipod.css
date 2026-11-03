@@ -1,0 +1,195 @@
+/* =============================================================
+   iPod (mini video oynatıcı): temaya göre kasa, tekerlek, çıkartma ve
+   ritimle atan ekran parıltısı. Renkler WCAG 4.5:1 okunabilirlik için ölçüldü.
+   --bass / --beat değişkenlerini ses motoru doğrudan .ipod elemanına yazar.
+   ============================================================= */
+
+.ipod {
+  /* varsayılan: nötr gümüş (tema bulunamazsa) */
+  --ip-top: #e4e2dc;
+  --ip-bot: #cfccc4;
+  --ip-hi: rgba(255, 255, 255, .65);
+  --ip-lo: rgba(0, 0, 0, .12);
+  --ip-wheel: #f6f5f1;
+  --ip-ink: #55524c;
+  --ip-hover: rgba(0, 0, 0, .07);
+  --ip-center: #dedcd6;
+  --ip-center-ink: #3f3d38;
+  --ip-close: #55524c;
+  --ip-bezel: #2a2a2c;
+  --ip-glow: rgba(255, 255, 255, .6);
+  --ip-led: #ffffff;
+  --ip-decal: none;
+  --ip-overlay: linear-gradient(transparent, transparent);
+
+  --bass: 0;
+  --beat: 0;
+
+  filter:
+    drop-shadow(0 14px 28px rgba(0, 0, 0, .6))
+    drop-shadow(0 0 calc(var(--bass) * 16px) var(--ip-glow));
+}
+
+.ipod-body {
+  position: relative;
+  overflow: hidden;
+  background: var(--ip-overlay), linear-gradient(165deg, var(--ip-top), var(--ip-bot));
+  box-shadow: inset 0 1px 0 var(--ip-hi), inset 0 -2px 0 var(--ip-lo);
+  transition: background-color .3s;
+}
+
+/* Çıkartma: sol alt köşe (kapat düğmesi sağ üstte, tekerlek ortada) */
+.ipod-body::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  bottom: 9px;
+  width: 20px;
+  height: 20px;
+  background: var(--ip-decal) center / contain no-repeat;
+  opacity: .95;
+  pointer-events: none;
+}
+
+/* Vuruşla yanan küçük ışık (parlama --beat ile; sert yanıp sönme 3/sn altında tutulur) */
+.ipod-body::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ip-led);
+  opacity: calc(.22 + var(--beat) * .78);
+  box-shadow: 0 0 calc(var(--beat) * 9px) var(--ip-led);
+  pointer-events: none;
+}
+
+.ipod-close { color: var(--ip-close); }
+.ipod-close:hover { color: var(--ip-close); background: var(--ip-hover); border-radius: 50%; }
+
+/* Ekran: çerçeve rengi temadan, parıltı basla büyür */
+.ipod-screen {
+  border-color: var(--ip-bezel);
+  box-shadow:
+    0 0 calc(3px + var(--bass) * 16px) calc(var(--bass) * 2px) var(--ip-glow),
+    inset 0 0 14px rgba(0, 0, 0, .65);
+}
+.ipod.dragover .ipod-screen { border-color: var(--ip-glow); }
+.ipod-hud { background: rgba(0, 0, 0, .62); }
+.ipod-bar i { background: var(--ip-led); }
+
+/* Tekerlek */
+.ipod-wheel {
+  background: var(--ip-wheel);
+  box-shadow: inset 0 0 0 1px var(--ip-lo), inset 0 2px 6px var(--ip-lo);
+}
+.ipod-wheel button { color: var(--ip-ink); border-radius: 8px; }
+.ipod-wheel button:hover { color: var(--ip-ink); background: var(--ip-hover); }
+.ipod-wheel .w-center {
+  background: var(--ip-center);
+  color: var(--ip-center-ink);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--ip-lo), 0 1px 0 var(--ip-hi);
+}
+.ipod-wheel .w-center:hover { background: var(--ip-center); filter: brightness(1.06); }
+.ipod :focus-visible { outline-color: var(--ip-ink); }
+.ipod-close:focus-visible { outline-color: var(--ip-close); }
+
+/* Açılış: hafif yaylanma (hareketi azalt açıkken system.css animasyonu kapatır) */
+.ipod.visible { animation: ipodIn .34s cubic-bezier(.2, .9, .25, 1.12); }
+@keyframes ipodIn {
+  from { opacity: 0; transform: translateY(22px) scale(.93); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------------- Temalar ---------------- */
+
+html[data-theme="sakura"] .ipod {
+  --ip-top: #f6dbe6; --ip-bot: #e8b4cb; --ip-hi: rgba(255, 255, 255, .8); --ip-lo: rgba(122, 52, 84, .16);
+  --ip-wheel: #fdf0f5; --ip-ink: #8a3d5f; --ip-hover: rgba(138, 61, 95, .1);
+  --ip-center: #f3cfdd; --ip-center-ink: #7a3454; --ip-close: #7a3454;
+  --ip-bezel: #4b2a3b; --ip-glow: rgba(239, 150, 190, .95); --ip-led: #e0679a;
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='%23e0679a'%3E%3Cellipse cx='12' cy='6' rx='3.6' ry='5'/%3E%3Cellipse cx='12' cy='6' rx='3.6' ry='5' transform='rotate(72 12 12)'/%3E%3Cellipse cx='12' cy='6' rx='3.6' ry='5' transform='rotate(144 12 12)'/%3E%3Cellipse cx='12' cy='6' rx='3.6' ry='5' transform='rotate(216 12 12)'/%3E%3Cellipse cx='12' cy='6' rx='3.6' ry='5' transform='rotate(288 12 12)'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='2.2' fill='%23f7d98a'/%3E%3C/svg%3E");
+}
+
+html[data-theme="rose"] .ipod {
+  --ip-top: #8c2335; --ip-bot: #561421; --ip-hi: rgba(255, 190, 200, .35); --ip-lo: rgba(0, 0, 0, .3);
+  --ip-wheel: #b13149; --ip-ink: #fff0f2; --ip-hover: rgba(255, 255, 255, .16);
+  --ip-center: #8c2335; --ip-center-ink: #ffffff; --ip-close: #ffd9df;
+  --ip-bezel: #25090f; --ip-glow: rgba(224, 83, 104, 1); --ip-led: #ffb3be;
+  --ip-overlay: linear-gradient(115deg, transparent 0 46%, rgba(255, 255, 255, .09) 50%, transparent 54% 100%);
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='%23c9364e'/%3E%3Cpath d='M12 12m-6.2 0a6.2 6.2 0 1 0 12.4 0 6.2 6.2 0 1 0-12.4 0M12 12m-3.1 0a3.1 3.1 0 1 0 6.2 0 3.1 3.1 0 1 0-6.2 0' fill='none' stroke='%23f5a0ae' stroke-width='1.3'/%3E%3C/svg%3E");
+}
+
+html[data-theme="green"] .ipod {
+  --ip-top: #d3e8d6; --ip-bot: #a6c7ae; --ip-hi: rgba(255, 255, 255, .7); --ip-lo: rgba(27, 70, 48, .18);
+  --ip-wheel: #eef7f0; --ip-ink: #2d6a47; --ip-hover: rgba(45, 106, 71, .1);
+  --ip-center: #cfe5d4; --ip-center-ink: #1f4d32; --ip-close: #1b4630;
+  --ip-bezel: #17301f; --ip-glow: rgba(78, 201, 133, .95); --ip-led: #2f9d5f;
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 20C3 10 9 4 21 3c1 11-5 18-17 17z' fill='%233f8f5d'/%3E%3Cpath d='M4 20C9 14 14 9 20 4' stroke='%23cfeede' stroke-width='1.4' fill='none'/%3E%3C/svg%3E");
+}
+
+html[data-theme="nemophila"] .ipod {
+  --ip-top: #d9e9fb; --ip-bot: #aecdf2; --ip-hi: rgba(255, 255, 255, .8); --ip-lo: rgba(35, 79, 132, .16);
+  --ip-wheel: #f0f7ff; --ip-ink: #2a5c98; --ip-hover: rgba(42, 92, 152, .1);
+  --ip-center: #cde2f8; --ip-center-ink: #234f84; --ip-close: #234f84;
+  --ip-bezel: #14263d; --ip-glow: rgba(90, 162, 242, 1); --ip-led: #3b86d6;
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='%235aa2f2'%3E%3Cellipse cx='12' cy='6' rx='3.8' ry='5'/%3E%3Cellipse cx='12' cy='6' rx='3.8' ry='5' transform='rotate(72 12 12)'/%3E%3Cellipse cx='12' cy='6' rx='3.8' ry='5' transform='rotate(144 12 12)'/%3E%3Cellipse cx='12' cy='6' rx='3.8' ry='5' transform='rotate(216 12 12)'/%3E%3Cellipse cx='12' cy='6' rx='3.8' ry='5' transform='rotate(288 12 12)'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='2.4' fill='%23ffffff'/%3E%3C/svg%3E");
+}
+
+/* Yağmur: buğulu çelik kasa, üstünde su damlaları */
+html[data-theme="rain"] .ipod {
+  --ip-top: #52667a; --ip-bot: #34445a; --ip-hi: rgba(255, 255, 255, .28); --ip-lo: rgba(0, 0, 0, .3);
+  --ip-wheel: #5b7085; --ip-ink: #ffffff; --ip-hover: rgba(255, 255, 255, .16);
+  --ip-center: #566c82; --ip-center-ink: #ffffff; --ip-close: #e6f0f8;
+  --ip-bezel: #15202b; --ip-glow: rgba(150, 190, 225, 1); --ip-led: #bcdcf5;
+  --ip-overlay:
+    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, .5) 0 2px, rgba(255, 255, 255, .12) 3px 5px, transparent 6px),
+    radial-gradient(circle at 82% 9%, rgba(255, 255, 255, .42) 0 1.6px, rgba(255, 255, 255, .1) 2.6px 4.5px, transparent 5.5px),
+    radial-gradient(circle at 90% 88%, rgba(255, 255, 255, .4) 0 2.2px, rgba(255, 255, 255, .1) 3.2px 5.4px, transparent 6.4px),
+    radial-gradient(circle at 8% 70%, rgba(255, 255, 255, .34) 0 1.4px, rgba(255, 255, 255, .08) 2.4px 4px, transparent 5px),
+    linear-gradient(170deg, rgba(255, 255, 255, .1), transparent 40%);
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3C12 3 5 11 5 15a7 7 0 0 0 14 0C19 11 12 3 12 3z' fill='%23a9c8e6'/%3E%3Cpath d='M9 15a3 3 0 0 0 3 3' stroke='%23ffffff' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Kar: beyaz buzlu kasa (açık tema) */
+html[data-theme="snow"] .ipod {
+  --ip-top: #ffffff; --ip-bot: #dfeaf5; --ip-hi: rgba(255, 255, 255, 1); --ip-lo: rgba(53, 85, 122, .16);
+  --ip-wheel: #f7fbff; --ip-ink: #3d5f82; --ip-hover: rgba(61, 95, 130, .1);
+  --ip-center: #e6eff8; --ip-center-ink: #35557a; --ip-close: #35557a;
+  --ip-bezel: #3a4f63; --ip-glow: rgba(140, 185, 230, 1); --ip-led: #5c9bd6;
+  --ip-overlay:
+    radial-gradient(circle at 24% 20%, rgba(150, 190, 230, .35) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 70% 12%, rgba(150, 190, 230, .3) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 88% 78%, rgba(150, 190, 230, .32) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 12% 62%, rgba(150, 190, 230, .28) 0 1px, transparent 1.8px);
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg stroke='%236f9cc9' stroke-width='1.8' stroke-linecap='round' fill='none'%3E%3Cpath d='M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Fırtına: mat siyah, ekran çevresinde mavi şimşek parıltısı */
+html[data-theme="storm"] .ipod {
+  --ip-top: #1e2438; --ip-bot: #0d101c; --ip-hi: rgba(160, 185, 255, .22); --ip-lo: rgba(0, 0, 0, .5);
+  --ip-wheel: #283049; --ip-ink: #d6dffc; --ip-hover: rgba(255, 255, 255, .12);
+  --ip-center: #1f2740; --ip-center-ink: #e2e9ff; --ip-close: #c7d3f5;
+  --ip-bezel: #070a12; --ip-glow: rgba(108, 139, 210, 1); --ip-led: #f4d45c;
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13 2L5 14h6l-1 8 9-13h-6z' fill='%23f4d45c'/%3E%3C/svg%3E");
+}
+
+/* Altın yapraklar: bronz kasa */
+html[data-theme="yellow"] .ipod {
+  --ip-top: #d9b45a; --ip-bot: #9a7425; --ip-hi: rgba(255, 240, 190, .6); --ip-lo: rgba(60, 40, 5, .25);
+  --ip-wheel: #f0dc9c; --ip-ink: #4d3505; --ip-hover: rgba(77, 53, 5, .1);
+  --ip-center: #e3c978; --ip-center-ink: #4d3505; --ip-close: #2b1d02;
+  --ip-bezel: #2e1f06; --ip-glow: rgba(229, 184, 66, 1); --ip-led: #fff0b8;
+  --ip-decal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l2 4 4-1-1 5 4 2-4 2 1 4-4-1-2 5-2-5-4 1 1-4-4-2 4-2-1-5 4 1z' fill='%23b8531c'/%3E%3C/svg%3E");
+}
+
+/* Hareketi azalt: açılış animasyonu system.css'teki genel kuralla kapanır; ayrıca parıltı sabitlenir */
+@media (prefers-reduced-motion: reduce) {
+  .ipod { filter: drop-shadow(0 14px 28px rgba(0, 0, 0, .6)); }
+}
+@media (prefers-contrast: more) {
+  .ipod-wheel button { font-weight: 800; }
+}

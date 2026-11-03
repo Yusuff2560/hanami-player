@@ -170,10 +170,22 @@ function writeShake(s: Shake, enabled: boolean) {
   vizTarget.style.setProperty('--shake-r', v.r.toFixed(3) + 'deg');
 }
 
+// iPod kasası ritim değişkenlerini kendi elemanında okur (kök elemana yazmak tüm sayfayı yeniden hesaplatırdı)
+let ipodTarget: HTMLElement | null = null;
+export function setIpodTarget(el: HTMLElement | null) {
+  ipodTarget = el;
+}
+
 function writeVars(bass: number, beat: number, treb: number) {
+  const b = bass.toFixed(3);
+  const e = beat.toFixed(3);
+  if (ipodTarget) {
+    ipodTarget.style.setProperty('--bass', b);
+    ipodTarget.style.setProperty('--beat', e);
+  }
   if (!vizTarget) return;
-  vizTarget.style.setProperty('--bass', bass.toFixed(3));
-  vizTarget.style.setProperty('--beat', beat.toFixed(3));
+  vizTarget.style.setProperty('--bass', b);
+  vizTarget.style.setProperty('--beat', e);
   vizTarget.style.setProperty('--treb', treb.toFixed(3));
 }
 

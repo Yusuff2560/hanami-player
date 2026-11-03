@@ -14,7 +14,9 @@ Dosyaların cihazından hiçbir yere yüklenmez; her şey tarayıcıda, masaüst
 
 - Şarkı, klasör (masaüstü) ve video ekleme; albümler, favoriler, son çalınanlar
 - Ritimle titreyen kelime: [Beat This!](https://github.com/CPJKU/beat_this) yapay zeka modeli (small, ~2 milyon parametre) şarkının vuruşlarını bulur, yazı tam o anlarda sarsılır
-- 8 mevsim teması, tam ekran oynatıcı, mini video oynatıcı
+- **Kalıcı kitaplık:** eklediğin şarkılar, favoriler, albümler ve son çalınanlar uygulamayı kapatıp açınca yerinde kalır (şarkı dosyalarının bir kopyası uygulamanın yerel deposunda saklanır, orijinaller değişmez)
+- 8 mevsim teması, tam ekran oynatıcı
+- **Temayla uyumlu mini video oynatıcı (iPod):** her temanın kendi kasası, tekerleği ve çıkartması var; ekran parıltısı ve ışığı müziğin ritmiyle atar
 - Klavye kısayolları, medya tuşları, yerel menü çubuğu (masaüstü), bildirimden denetim ve arka planda çalma (Android)
 - Erişilebilirlik: klavyeyle gezinme, ekran okuyucu adları, hareketi azaltma ve "ışık yanıp sönmesini azalt" ayarı
 - Telefon düzeni: alt sekme çubuğu, alt sayfalar (sheet), güvenli alanlar
@@ -59,11 +61,11 @@ Yapıldı:
 - [x] Yazı tipleri uygulamanın içinde, çalışırken ağ isteği yok
 - [x] Windows `.exe` (kurulum + taşınabilir), GitHub Actions ile otomatik sürüm
 - [x] Android `.apk` (imzalı), arka planda çalma servisi ve bildirim düğmeleri
+- [x] Kütüphane kalıcılığı (şarkılar, favoriler, albümler, son çalınanlar), şarkıyı geri alınabilir kaldırma, kitaplığı temizleme
+- [x] Temayla uyumlu iPod: 8 tema için kasa, tekerlek, çıkartma, ritimle atan parıltı
 
 Sırada:
 
-- [ ] **Kütüphane kalıcılığı:** şarkı listesi ve albümler uygulamayı kapatınca kayboluyor (en büyük eksik)
-- [ ] **Temayla uyumlu mini video oynatıcı:** her temaya göre kasa tasarımı, ekran parıltısı
 - [ ] **Windows kod imzası:** SignPath Foundation başvurusu hazır, başvuru bekleniyor
 - [ ] **APK'yı gerçek telefonda sınamak:** kurulum, arka planda çalma, bildirim düğmeleri henüz bir cihazda görülmedi
 - [ ] Windows taşınabilir sürümünün antivirüs uyarısı (imza ile çözülmesi beklenir)
@@ -95,7 +97,7 @@ Every release needs the maintainer's manual approval before signing. Two-factor 
 
 This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
 
-HANAMI plays files from your own device. Music and videos are never uploaded. Rhythm analysis runs locally on the bundled [Beat This!](https://github.com/CPJKU/beat_this) model, and fonts are bundled, so the app makes no network requests while running (the website only loads its own files from its host). Nothing is collected, tracked or sent to analytics services. Analysis results are cached only in your browser's local storage (IndexedDB).
+HANAMI plays files from your own device. Music and videos are never uploaded. Rhythm analysis runs locally on the bundled [Beat This!](https://github.com/CPJKU/beat_this) model, and fonts are bundled, so the app makes no network requests while running (the website only loads its own files from its host). Nothing is collected, tracked or sent to analytics services. Your library is stored only on your device: songs you add are copied into the app's local storage (IndexedDB) so they are still there after a restart, together with favorites, play history and rhythm-analysis results. Your original files are never modified or deleted. "Clear library" in the settings removes all of it.
 
 ### Installing and uninstalling
 
@@ -113,7 +115,7 @@ The Windows binaries are not code-signed yet (see the status above), and they ar
 ## Yeni sürüm yayınlamak
 
 ```bash
-git tag v0.3.3 && git push origin v0.3.3
+git tag vX.Y.Z && git push origin vX.Y.Z
 ```
 
 GitHub Actions Windows `.exe` dosyalarını ve imzalı Android `.apk` dosyasını derleyip Releases'e yükler.

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { audio, initAudioContext, registerVideo, startVisualizer } from '../engine/audio';
+import { audio, initAudioContext, registerVideo, setIpodTarget, startVisualizer } from '../engine/audio';
 import { useDraggable } from '../hooks';
 import Icon from './Icon';
 import { useStore } from '../store';
@@ -29,6 +29,11 @@ export default function Ipod() {
     setHud({ text, show: true });
     window.clearTimeout(hudTimer.current);
     hudTimer.current = window.setTimeout(() => setHud(h => ({ ...h, show: false })), 900);
+  }, []);
+
+  useEffect(() => {
+    setIpodTarget(boxRef.current);
+    return () => setIpodTarget(null);
   }, []);
 
   useEffect(() => {

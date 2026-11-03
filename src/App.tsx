@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import AlbumModal from './components/AlbumModal';
+import ConfirmDialog from './components/ConfirmDialog';
 import Immersive from './components/Immersive';
 import Ipod from './components/Ipod';
 import JpWord from './components/JpWord';
@@ -147,6 +148,7 @@ export default function App() {
       <Ipod />
       <Immersive />
       <AlbumModal />
+      <ConfirmDialog />
       <SettingsSheet onPickFiles={pickFiles} onPickFolder={pickFolder} />
       <Toast />
 

@@ -296,3 +296,28 @@ html[data-theme="snow"] .fx-switch input:checked::after { background: #fff; }
 @media (min-width: 768px) {
   .app.sidebar-hidden .sidebar { display: none; }
 }
+
+/* Kitaplık bilgisi ve onay penceresi */
+.lib-info { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r); }
+.lib-info-text { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.lib-info-text b { color: var(--pale); font-size: 13px; font-weight: 600; }
+.lib-info-text small { font-size: 12px; line-height: 1.5; opacity: .9; }
+.lib-info .btn { width: 100%; justify-content: center; }
+.lib-info .btn:disabled { opacity: .45; cursor: default; transform: none; }
+#mainApp[data-theme="snow"] .lib-info { border-color: #d3dfeb; }
+#mainApp[data-theme="snow"] .lib-info-text, #mainApp[data-theme="snow"] .lib-info-text b { color: #5b7186; }
+.confirm-backdrop { z-index: 300; }
+.confirm-box { width: min(420px, 92vw); }
+.confirm-body { padding: 22px 24px 8px; }
+.confirm-body h3 { margin: 0 0 8px; font: 700 18px/1.3 var(--font-display); }
+.confirm-body p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px 20px; }
+@media (max-width: 767px) {
+  .confirm-backdrop { align-items: center; padding: 20px; }
+  .confirm-box { border-radius: 18px; max-height: none; animation: modalIn .25s cubic-bezier(.16, 1, .3, 1); }
+}
+
+/* Kenar çubuğu kısa pencerede taşmasın: kaydırılabilir (alttaki kontroller erişilebilir kalsın) */
+.sidebar { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .2) transparent; }
+.sidebar-foot { flex: none; }
+#mainApp[data-theme="snow"] .sidebar { scrollbar-color: rgba(53, 85, 122, .3) transparent; }

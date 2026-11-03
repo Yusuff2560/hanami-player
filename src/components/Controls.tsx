@@ -1,7 +1,37 @@
 import { themeOptions, themes } from '../engine/themes';
 import { setJpGain } from '../engine/audio';
+import { useEffect, useState } from 'react';
+import { storageEstimate } from '../library';
 import { useStore } from '../store';
 import Icon from './Icon';
+
+const mb = (n: number) => (n >= 1073741824 ? (n / 1073741824).toFixed(1) + ' GB' : Math.max(1, Math.round(n / 1048576)) + ' MB');
+
+function LibraryInfo() {
+  const count = useStore(s => s.tracks.length);
+  const bytes = useStore(s => s.tracks.reduce((sum, t) => sum + t.size, 0));
+  const [quota, setQuota] = useState<{ usage: number; quota: number } | null>(null);
+  useEffect(() => {
+    void storageEstimate().then(setQuota);
+  }, [count]);
+  const clearLibrary = useStore.getState().clearLibrary;
+  return (
+    <div className="lib-info">
+      <div className="lib-info-text">
+        <b>Kitaplık</b>
+        <span>
+          {count} şarkı • {mb(bytes)}
+          {quota ? ` • ${mb(quota.usage)} / ${mb(quota.quota)} kullanıldı` : ''}
+        </span>
+        <small>Eklenen şarkıların bir kopyası bu uygulamada saklanır; orijinal dosyaların değişmez.</small>
+      </div>
+      <button className="btn danger" disabled={count === 0} onClick={clearLibrary}>
+        <Icon name="trash" size={16} />
+        Kitaplığı temizle
+      </button>
+    </div>
+  );
+}
 
 export function ThemePicker() {
   const theme = useStore(s => s.theme);
@@ -88,6 +118,8 @@ export function ToolButtons({ onPickFiles, onPickFolder, onNavigate }: ToolProps
           }}
         />
       </label>
+      <LibraryInfo />
+
       <label className="fx-switch">
         <input type="checkbox" role="switch" checked={reduceFlash} onChange={e => setReduceFlash(e.target.checked)} />
         <span>Işık yanıp sönmesini azalt</span>

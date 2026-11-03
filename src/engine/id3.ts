@@ -1,5 +1,5 @@
 // MP3/M4A içindeki ID3 APIC (kapak resmi) çerçevesini okur.
-export async function readMp3Cover(file: File): Promise<string | null> {
+export async function readCoverBlob(file: Blob): Promise<Blob | null> {
   try {
     const head = await file.slice(0, Math.min(file.size, 8 * 1024 * 1024)).arrayBuffer();
     const b = new Uint8Array(head);
@@ -37,7 +37,7 @@ export async function readMp3Cover(file: File): Promise<string | null> {
         }
         if (q < pos + 10 + n) {
           const blob = new Blob([b.slice(q, pos + 10 + n)], { type: mime });
-          if (blob.size > 0) return URL.createObjectURL(blob);
+          if (blob.size > 0) return blob;
         }
       }
       pos += 10 + n;
@@ -46,4 +46,9 @@ export async function readMp3Cover(file: File): Promise<string | null> {
     /* kapak okunamadı */
   }
   return null;
+}
+
+export async function readMp3Cover(file: Blob): Promise<string | null> {
+  const blob = await readCoverBlob(file);
+  return blob ? URL.createObjectURL(blob) : null;
 }
