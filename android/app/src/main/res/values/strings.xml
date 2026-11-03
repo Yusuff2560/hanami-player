@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HANAMI</string>
+    <string name="title_activity_main">HANAMI</string>
+    <string name="package_name">com.yusuff2560.hanami</string>
+    <string name="custom_url_scheme">com.yusuff2560.hanami</string>
+</resources>

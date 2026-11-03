@@ -8,8 +8,8 @@
   --bottom-chrome: 88px;
   --tabbar-h: 56px;
   --mini-h: 64px;
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
+  --sat: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --sab: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
 }
 html[data-theme="snow"] { --focus: #2f5d8a; }
 

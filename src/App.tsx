@@ -12,6 +12,7 @@ import TabBar from './components/TabBar';
 import Toast from './components/Toast';
 import { createAmbient, type AmbientHandle } from './engine/ambient';
 import { audio, setJpGain, setReduceFlash } from './engine/audio';
+import { initAndroid } from './engine/android';
 import { initMediaSession } from './engine/mediaSession';
 import { initShortcuts } from './engine/shortcuts';
 import { themes } from './engine/themes';
@@ -85,9 +86,11 @@ export default function App() {
     setJpGain(useStore.getState().fxGain);
     const offShortcuts = initShortcuts();
     const offSession = initMediaSession();
+    const offAndroid = initAndroid();
     return () => {
       offShortcuts();
       offSession();
+      offAndroid();
     };
   }, []);
 
